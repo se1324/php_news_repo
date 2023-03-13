@@ -1,0 +1,29 @@
+.article_container {
+    width: 1100px;
+    margin: 0 auto;
+}
+
+.ar_title {
+    font-size: 2.8em;
+    font-weight: 700;
+    line-height: 1.3;
+    color: black;
+}
+
+.ar_author_date time {
+    color: grey;
+}
+
+.ar_author_date a {
+    text-decoration: none;
+    color: dodgerblue;
+}
+
+.ar_author_date a:hover {
+    color: green;
+}
+
+.ar_introduction {
+    font-size: 1.1em;
+    line-height: 1.3;
+}
