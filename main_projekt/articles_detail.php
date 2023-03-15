@@ -41,7 +41,7 @@ if (isset($_GET['article_id'])) {
         <div class="navbar-nav">
             <a class="nav-link active" href="index.php">Zprávy</a>
             <a class="nav-link" href="#">Kategorie</a>
-            <a class="nav-link" href="#">Autoři</a>
+            <a class="nav-link" href="authors_list.php">Autoři</a>
             <a class="nav-link" href="#">Administrace článků</a>
             <a class="nav-link" href="#">Přidat článek</a>
         </div>
@@ -49,22 +49,24 @@ if (isset($_GET['article_id'])) {
 </nav>
 
 
-<div class="container-fluid article_container">
-    <div class="mb-5">
-        <div class="ar_title mb-2">
-            <?= $article['title'] ?>
+<div class="container-fluid row justify-content-center">
+    <div class="col-8">
+        <div class="mb-5">
+            <div class="ar_title mb-2">
+                <?= $article['title'] ?>
+            </div>
+            <div class="ar_author_date mb-2">
+                <time><?= (new DateTime($article['created_at']))->format("d.m.Y H:i") ?></time>
+                <a href="authors_detail.php?id=<?= $article['author_id'] ?>"><?= $article['author_fullname'] ?></a>
+            </div>
+            <div class="ar_introduction mb-3">
+                <?= $article['introduction'] ?>
+            </div>
         </div>
-        <div class="ar_author_date mb-2">
-            <time><?= (new DateTime($article['created_at']))->format("d.m.Y H:i") ?></time>
-            <a href=""><?= $article['author_fullname'] ?></a>
-        </div>
-        <div class="ar_introduction mb-3">
-            <?= $article['introduction'] ?>
-        </div>
+        <main>
+            <?= $article['content'] ?>
+        </main>
     </div>
-    <main>
-        <?= $article['content'] ?>
-    </main>
 </div>
 
 <script src="./bootstrap/js/bootstrap.bundle.min.js"></script>
