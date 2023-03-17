@@ -8,6 +8,11 @@ $sql = 'SELECT *, (select count(*) from articles where author_id = ath.id) as ar
 $stmt = $db->conn->prepare($sql);
 $stmt->execute();
 $authors = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+$showerror = false;
+if (isset($_GET['prevent_deletion_author_id']) && is_numeric($_GET['prevent_deletion_author_id'])) {
+    $showerror = true;
+}
 ?>
 
 
@@ -27,9 +32,9 @@ $authors = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <nav class="navbar navbar-expand-lg bg-primary mb-4" data-bs-theme="dark">
     <div class="container-fluid">
         <div class="navbar-nav">
-            <a class="nav-link active" href="index.php">Zprávy</a>
+            <a class="nav-link" href="index.php">Zprávy</a>
             <a class="nav-link" href="#">Kategorie</a>
-            <a class="nav-link" href="authors_list.php">Autoři</a>
+            <a class="nav-link active" href="authors_list.php">Autoři</a>
             <a class="nav-link" href="#">Administrace článků</a>
             <a class="nav-link" href="#">Přidat článek</a>
         </div>
@@ -39,6 +44,11 @@ $authors = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 <div class="container-fluid row justify-content-center">
     <div class="col-7">
+        <?php if($showerror): ?>
+        <div class="alert alert-danger" role="alert">
+            Nelze smazat autora s více než 0 články!
+        </div>
+        <?php endif; ?>
         <div class="mb-4">
             <h1>Seznam autorů</h1>
         </div>

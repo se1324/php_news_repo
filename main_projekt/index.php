@@ -47,7 +47,9 @@ $articles = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <?php foreach ($articles as $article): ?>
                 <div class="mb-3">
                     <div class="ar_title mb-2">
-                        <?= $article['title'] ?>
+                        <a href="articles_detail.php?article_id=<?= $article['id'] ?>">
+                            <?= $article['title'] ?>
+                        </a>
                     </div>
                     <div class="ar_author_date mb-2">
                         <time><?= (new DateTime($article['created_at']))->format("d.m.Y H:i") ?></time>
