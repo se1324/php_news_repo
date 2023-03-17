@@ -15,7 +15,7 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
     ]);
     $author = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    $sql = 'SELECT * from articles where author_id = :author_id';
+    $sql = 'SELECT * from articles where author_id = :author_id and is_published = 1';
     $stmt = $db->conn->prepare($sql);
     $stmt->execute([
         ':author_id' => $_GET['id'],
@@ -49,7 +49,7 @@ else {
     <div class="container-fluid">
         <div class="navbar-nav">
             <a class="nav-link" href="index.php">Zprávy</a>
-            <a class="nav-link" href="#">Kategorie</a>
+            <a class="nav-link" href="categories_list.php">Kategorie</a>
             <a class="nav-link active" href="authors_list.php">Autoři</a>
             <a class="nav-link" href="#">Administrace článků</a>
             <a class="nav-link" href="#">Přidat článek</a>
@@ -66,7 +66,7 @@ else {
                 <h2>Autor nemá žádné články</h2>
             <?php else: ?>
             <?php foreach ($articles as $article): ?>
-                <div class="mb-3">
+                <div class="mb-4">
                     <div class="ar_title mb-2">
                         <a href="articles_detail.php?article_id=<?= $article['id'] ?>">
                             <?= $article['title'] ?>

@@ -1,10 +1,16 @@
 <?php
 
+header('Cache-Control: no-store, no-cache');
+
 require_once 'classes/Database.php';
 
 $db = new Database();
 
-$sql = 'SELECT a.*,CONCAT(ath.name, " ", ath.surname) as author_fullname from articles a left join authors ath on a.author_id = ath.id';
+$sql = 'SELECT a.*,CONCAT(ath.name, " ", ath.surname) as author_fullname from articles a 
+        left join authors ath on a.author_id = ath.id 
+        where a.is_published = 1
+        ORDER by a.created_at DESC 
+        LIMIT 5';
 $stmt = $db->conn->prepare($sql);
 $stmt->execute();
 $articles = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -28,7 +34,7 @@ $articles = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <div class="container-fluid">
         <div class="navbar-nav">
             <a class="nav-link active" href="index.php">Zprávy</a>
-            <a class="nav-link" href="#">Kategorie</a>
+            <a class="nav-link" href="categories_list.php">Kategorie</a>
             <a class="nav-link" href="authors_list.php">Autoři</a>
             <a class="nav-link" href="#">Administrace článků</a>
             <a class="nav-link" href="#">Přidat článek</a>
@@ -45,7 +51,7 @@ $articles = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </div>
         <div class="d-flex justify-content-center flex-column">
             <?php foreach ($articles as $article): ?>
-                <div class="mb-3">
+                <div class="mb-4">
                     <div class="ar_title mb-2">
                         <a href="articles_detail.php?article_id=<?= $article['id'] ?>">
                             <?= $article['title'] ?>

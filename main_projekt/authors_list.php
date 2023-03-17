@@ -1,10 +1,15 @@
 <?php
 
+header('Cache-Control: no-store, no-cache');
+
 require_once 'classes/Database.php';
 
 $db = new Database();
 
-$sql = 'SELECT *, (select count(*) from articles where author_id = ath.id) as articles_count from authors ath';
+$sql = 'SELECT *, 
+        (select count(*) from articles where author_id = ath.id and is_published = 1) as articles_count_published,
+        (select count(*) from articles where author_id = ath.id and is_published = 0) as articles_count_not_published
+        from authors ath';
 $stmt = $db->conn->prepare($sql);
 $stmt->execute();
 $authors = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -33,7 +38,7 @@ if (isset($_GET['prevent_deletion_author_id']) && is_numeric($_GET['prevent_dele
     <div class="container-fluid">
         <div class="navbar-nav">
             <a class="nav-link" href="index.php">Zprávy</a>
-            <a class="nav-link" href="#">Kategorie</a>
+            <a class="nav-link" href="categories_list.php">Kategorie</a>
             <a class="nav-link active" href="authors_list.php">Autoři</a>
             <a class="nav-link" href="#">Administrace článků</a>
             <a class="nav-link" href="#">Přidat článek</a>
@@ -74,7 +79,7 @@ if (isset($_GET['prevent_deletion_author_id']) && is_numeric($_GET['prevent_dele
                             </a>
                         </td>
                         <td>
-                            <?= $author['articles_count'] ?>
+                            <?= $author['articles_count_published'].' veřejné, '.$author['articles_count_not_published'].' skryté' ?>
                         </td>
                         <td>
                             <?php

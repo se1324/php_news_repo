@@ -1,8 +1,6 @@
 <?php
-spl_autoload_register(function ($class) {
-    require "classes/{$class}.php";
-});
 
+require_once 'classes/Database.php';
 $db = new Database();
 
 if (isset($_GET['article_id'])) {
@@ -40,7 +38,7 @@ if (isset($_GET['article_id'])) {
     <div class="container-fluid">
         <div class="navbar-nav">
             <a class="nav-link active" href="index.php">Zprávy</a>
-            <a class="nav-link" href="#">Kategorie</a>
+            <a class="nav-link" href="categories_list.php">Kategorie</a>
             <a class="nav-link" href="authors_list.php">Autoři</a>
             <a class="nav-link" href="#">Administrace článků</a>
             <a class="nav-link" href="#">Přidat článek</a>
