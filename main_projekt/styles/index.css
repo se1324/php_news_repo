@@ -23,6 +23,10 @@
 }
 
 
+.ar_category {
+    color: grey;
+}
+
 .ar_author_date time {
     color: grey;
 }

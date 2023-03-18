@@ -1,6 +1,6 @@
 <?php
 
-header('Cache-Control: no-store, no-cache');
+header('Cache-Control: no-store, no-cache, max-age=0, must-revalidate');
 
 require_once 'classes/Database.php';
 
@@ -31,18 +31,8 @@ if (isset($_GET['prevent_deletion_category_id']) && is_numeric($_GET['prevent_de
     <link rel="stylesheet" href="./styles/index.css">
 </head>
 <body>
-<nav class="navbar navbar-expand-lg bg-primary mb-4" data-bs-theme="dark">
-    <div class="container-fluid">
-        <div class="navbar-nav">
-            <a class="nav-link" href="index.php">Zprávy</a>
-            <a class="nav-link active" href="categories_list.php">Kategorie</a>
-            <a class="nav-link" href="authors_list.php">Autoři</a>
-            <a class="nav-link" href="#">Administrace článků</a>
-            <a class="nav-link" href="#">Přidat článek</a>
-        </div>
-    </div>
-</nav>
 
+<?php include_once 'reusable_components/navbar.php'; ?>
 
 <div class="container-fluid row justify-content-center">
     <div class="col-7">

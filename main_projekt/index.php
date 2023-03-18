@@ -1,13 +1,14 @@
 <?php
 
-header('Cache-Control: no-store, no-cache');
+header('Cache-Control: no-store, no-cache, max-age=0, must-revalidate');
 
 require_once 'classes/Database.php';
 
 $db = new Database();
 
-$sql = 'SELECT a.*,CONCAT(ath.name, " ", ath.surname) as author_fullname from articles a 
+$sql = 'SELECT a.*,CONCAT(ath.name, " ", ath.surname) as author_fullname, c.id as cat_id, c.category_name from articles a 
         left join authors ath on a.author_id = ath.id 
+        left join categories c on a.category_id = c.id
         where a.is_published = 1
         ORDER by a.created_at DESC 
         LIMIT 5';
@@ -30,18 +31,8 @@ $articles = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <link rel="stylesheet" href="./styles/index.css">
 </head>
 <body>
-<nav class="navbar navbar-expand-lg bg-primary mb-4" data-bs-theme="dark">
-    <div class="container-fluid">
-        <div class="navbar-nav">
-            <a class="nav-link active" href="index.php">Zprávy</a>
-            <a class="nav-link" href="categories_list.php">Kategorie</a>
-            <a class="nav-link" href="authors_list.php">Autoři</a>
-            <a class="nav-link" href="#">Administrace článků</a>
-            <a class="nav-link" href="#">Přidat článek</a>
-        </div>
-    </div>
-</nav>
 
+<?php include_once 'reusable_components/navbar.php'; ?>
 
 <div class="container-fluid row justify-content-center">
     <div class="col-7">
@@ -57,8 +48,17 @@ $articles = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <?= $article['title'] ?>
                         </a>
                     </div>
+                    <div class="ar_category mb-1">
+                        Kategorie:
+                        <a href="categories_detail.php?id=<?= $article['cat_id'] ?>"><?= $article['category_name'] ?></a>
+                    </div>
                     <div class="ar_author_date mb-2">
-                        <time><?= (new DateTime($article['created_at']))->format("d.m.Y H:i") ?></time>
+                        <time>
+                            <?php
+                            $fmt = datefmt_create('cs-CZ', IntlDateFormatter::FULL, IntlDateFormatter::SHORT);
+                            echo $fmt->format(new DateTime($article['created_at']));
+                            ?>
+                        </time>
                         <a href="authors_detail.php?id=<?= $article['author_id'] ?>"><?= $article['author_fullname'] ?></a>
                     </div>
                     <div class="ar_introduction mb-3">

@@ -53,17 +53,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <link rel="stylesheet" href="./bootstrap/css/bootstrap.min.css">
 </head>
 <body>
-<nav class="navbar navbar-expand-lg bg-primary mb-4" data-bs-theme="dark">
-    <div class="container-fluid">
-        <div class="navbar-nav">
-            <a class="nav-link" href="index.php">Zprávy</a>
-            <a class="nav-link" href="categories_list.php">Kategorie</a>
-            <a class="nav-link active" href="authors_list.php">Autoři</a>
-            <a class="nav-link" href="#">Administrace článků</a>
-            <a class="nav-link" href="#">Přidat článek</a>
-        </div>
-    </div>
-</nav>
+
+<?php include_once 'reusable_components/navbar.php'; ?>
 
 <div class="container-fluid row justify-content-center">
     <div class="col-11">
