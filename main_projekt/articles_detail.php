@@ -46,19 +46,19 @@ else {
 
 <div class="container-fluid row justify-content-center">
     <div class="col-8">
-        <div class="mb-5">
+        <div class="mb-4">
             <div class="mb-4 d-flex justify-content-end">
                 <a href="articles_edit.php?id=<?= $article['id'] ?>" class="btn btn-primary me-1">Upravit článek</a>
                 <a href="articles_delete.php?id=<?= $article['id'] ?>" class="btn btn-danger">Smazat článek</a>
             </div>
-            <div class="ar_title mb-2">
+            <div class="ar_title mb-3">
                 <?= $article['title'] ?>
             </div>
             <div class="ar_category mb-1">
                 Kategorie:
                 <a href="categories_detail.php?id=<?= $article['cat_id'] ?>"><?= $article['category_name'] ?></a>
             </div>
-            <div class="ar_author_date mb-2">
+            <div class="ar_author_date mb-4">
                 <time>
                     <?php
                     $fmt = datefmt_create('cs-CZ', IntlDateFormatter::FULL, IntlDateFormatter::SHORT);
@@ -67,7 +67,7 @@ else {
                 </time>
                 <a href="authors_detail.php?id=<?= $article['author_id'] ?>"><?= $article['author_fullname'] ?></a>
             </div>
-            <div class="ar_introduction mb-3">
+            <div class="ar_introduction mb-3 fs-4 fw-semibold">
                 <?= $article['introduction'] ?>
             </div>
         </div>

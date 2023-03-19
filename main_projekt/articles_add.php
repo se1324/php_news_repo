@@ -84,8 +84,23 @@ $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
             width: 1000,
             height: 500,
             menubar: false,
-            language: "cs"
+            language: "cs",
+            setup: function (editor) {
+                editor.on('change', function () {
+                    tinymce.triggerSave();
+                });
+            },
+            init_instance_callback: function (editor) {
+                /*při inicializaci tinymce se zavolá tato funkce*/
+                const textarea = document.getElementById("article_content");
+                textarea.style.display = "block";
+                textarea.style.opacity = "0";
+                textarea.style.width = "0";
+                textarea.style.height = "0";
+                textarea.style.minHeight = "0";
+            }
         });
+
     </script>
 </head>
 <body>
@@ -103,7 +118,7 @@ $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
             </ul>
         <?php endif; ?>
         <div>
-            <form method="post">
+            <form method="post" id="submitForm">
                 <div class="mb-3">
                     <label>
                         Autor:
@@ -139,19 +154,19 @@ $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <div class="mb-3">
                     <label>
                         Titulek:
-                        <textarea name="title" class="form-control" cols="60" rows="10"></textarea>
+                        <textarea name="title" class="form-control" cols="60" rows="10" required></textarea>
                     </label>
                 </div>
                 <div class="mb-3">
                     <label>
                         Úvod:
-                        <textarea name="introduction" class="form-control" cols="60" rows="20"></textarea>
+                        <textarea name="introduction" class="form-control" cols="60" rows="20" required></textarea>
                     </label>
                 </div>
                 <div class="mb-3">
                     <label>
                         Obsah:
-                        <textarea name="content" id="article_content" class="form-control"></textarea>
+                        <textarea name="content" id="article_content" class="form-control" required></textarea>
                     </label>
                 </div>
                 <button type="submit" class="btn btn-primary">Přidat</button>

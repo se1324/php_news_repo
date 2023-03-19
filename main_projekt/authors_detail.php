@@ -78,7 +78,7 @@ else {
                                     ?>
                                 </time>
                             </h6>
-                            <p class="card-text mb-3">
+                            <p class="card-text mb-3 fw-semibold fs-5">
                                 <?= $article['introduction'] ?>
                             </p>
                             <a href="articles_detail.php?article_id=<?= $article['id'] ?>" class="card-link btn btn-primary">Číst dál
