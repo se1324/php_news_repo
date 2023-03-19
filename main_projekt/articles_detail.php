@@ -5,7 +5,7 @@ header('Cache-Control: no-store, no-cache, max-age=0, must-revalidate');
 require_once 'classes/Database.php';
 $db = new Database();
 
-if (isset($_GET['article_id'])) {
+if (isset($_GET['article_id']) && is_numeric($_GET['article_id'])) {
     $sql = 'SELECT a.*, CONCAT(ath.name, " ", ath.surname) as author_fullname, c.id as cat_id, c.category_name from articles a 
             left join authors ath on a.author_id = ath.id 
             left join categories c on a.category_id = c.id
@@ -19,7 +19,10 @@ if (isset($_GET['article_id'])) {
 
     $article = $stmt->fetch(PDO::FETCH_ASSOC);
 }
-
+else {
+    header('Location: index.php');
+    die();
+}
 
 
 ?>
@@ -44,6 +47,10 @@ if (isset($_GET['article_id'])) {
 <div class="container-fluid row justify-content-center">
     <div class="col-8">
         <div class="mb-5">
+            <div class="mb-4 d-flex justify-content-end">
+                <a href="articles_edit.php?id=<?= $article['id'] ?>" class="btn btn-primary me-1">Upravit článek</a>
+                <a href="articles_delete.php?id=<?= $article['id'] ?>" class="btn btn-danger">Smazat článek</a>
+            </div>
             <div class="ar_title mb-2">
                 <?= $article['title'] ?>
             </div>

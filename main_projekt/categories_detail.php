@@ -59,26 +59,26 @@ else {
                 <h2>Kategorie neobsahuje žádné články</h2>
             <?php else: ?>
                 <?php foreach ($articles as $article): ?>
-                    <div class="mb-4">
-                        <div class="ar_title mb-2">
-                            <a href="articles_detail.php?article_id=<?= $article['id'] ?>">
-                                <?= $article['title'] ?>
-                            </a>
-                        </div>
-                        <div class="ar_author_date mb-2">
-                            <time>
-                                <?php
-                                $fmt = datefmt_create('cs-CZ', IntlDateFormatter::FULL, IntlDateFormatter::SHORT);
-                                echo $fmt->format(new DateTime($article['created_at']));
-                                ?>
-                            </time>
-                            <a href="authors_detail.php?id=<?= $article['author_id'] ?>"><?= $article['author_fullname'] ?></a>
-                        </div>
-                        <div class="ar_introduction mb-3">
-                            <?= $article['introduction'] ?>
-                        </div>
-                        <div class="d-flex justify-content-end ar_more">
-                            <a href="articles_detail.php?article_id=<?= $article['id'] ?>">Číst dál
+                    <div class="card mb-5">
+                        <div class="card-body">
+                            <h5 class="card-title ar_title mb-3">
+                                <a href="articles_detail.php?article_id=<?= $article['id'] ?>">
+                                    <?= $article['title'] ?>
+                                </a>
+                            </h5>
+                            <h6 class="card-subtitle mb-3 text-muted">
+                                <time>
+                                    <?php
+                                    $fmt = datefmt_create('cs-CZ', IntlDateFormatter::FULL, IntlDateFormatter::SHORT);
+                                    echo $fmt->format(new DateTime($article['created_at']));
+                                    ?>
+                                </time>
+                                <a href="authors_detail.php?id=<?= $article['author_id'] ?>"><?= $article['author_fullname'] ?></a>
+                            </h6>
+                            <p class="card-text mb-3">
+                                <?= $article['introduction'] ?>
+                            </p>
+                            <a href="articles_detail.php?article_id=<?= $article['id'] ?>" class="card-link btn btn-primary">Číst dál
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right" viewBox="0 0 16 16">
                                     <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/>
                                 </svg>

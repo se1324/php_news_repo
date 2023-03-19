@@ -4,7 +4,7 @@
             <a class="nav-link active" href="index.php">Zprávy</a>
             <a class="nav-link" href="categories_list.php">Kategorie</a>
             <a class="nav-link" href="authors_list.php">Autoři</a>
-            <a class="nav-link" href="#">Administrace článků</a>
+            <a class="nav-link" href="articles_list.php">Administrace článků</a>
         </div>
     </div>
 </nav>
