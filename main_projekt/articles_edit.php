@@ -140,7 +140,7 @@ else {
                     <label>
                         Autor:
                         <select name="author_id" class="form-select" required>
-                            <option value="">Vyberte autora</option>
+                            <option value="" selected>Vyberte autora</option>
                             <?php foreach ($authors as $author): ?>
                                 <option value="<?= $author['id'] ?>"
                                 <?php
