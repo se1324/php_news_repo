@@ -29,9 +29,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 
     if (empty($errors)) {
-        $is_published = false;
+        $is_published = 0;
         if (!empty($_POST['is_published']) && $_POST['is_published'] == '1') {
-            $is_published = true;
+            $is_published = 1;
         }
 
         $sql = 'INSERT into articles (author_id, category_id, title, introduction, content, is_published, created_at)

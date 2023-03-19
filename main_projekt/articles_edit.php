@@ -31,9 +31,9 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
 
 
         if (empty($errors)) {
-            $is_published = false;
+            $is_published = 0;
             if (!empty($_POST['is_published']) && $_POST['is_published'] == '1') {
-                $is_published = true;
+                $is_published = 1;
             }
 
             $sql = 'Update articles set author_id = :author_id, category_id = :category_id, title = :title,
