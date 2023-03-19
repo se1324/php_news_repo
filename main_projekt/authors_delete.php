@@ -25,7 +25,7 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
             ':id' => $_GET['id'],
         ]);
     }
-
-    header('Location: authors_list.php');
 }
+
+header('Location: authors_list.php');
 

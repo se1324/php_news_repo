@@ -25,7 +25,6 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
             ':id' => $_GET['id'],
         ]);
     }
-
-    header('Location: categories_list.php');
 }
 
+header('Location: categories_list.php');
