@@ -3,6 +3,8 @@
 header('Cache-Control: no-store, no-cache, max-age=0, must-revalidate');
 
 require_once 'classes/Database.php';
+require_once 'classes/DateUtils.php';
+
 $db = new Database();
 
 if (isset($_GET['article_id']) && is_numeric($_GET['article_id'])) {
@@ -38,42 +40,44 @@ else {
     <title>Detail článku</title>
 
     <link rel="stylesheet" href="./bootstrap/css/bootstrap.min.css">
-    <link rel="stylesheet" href="./styles/articles_detail.css">
 </head>
 <body>
 
 <?php include_once 'reusable_components/navbar.php'; ?>
 
 <div class="container-fluid row justify-content-center">
-    <div class="col-sm-10 col-lg-8">
+    <div class="col-sm-10 col-lg-9 p-4">
         <div class="mb-4">
-            <div class="mb-4 d-flex justify-content-end">
-                <a href="articles_edit.php?id=<?= $article['id'] ?>" class="btn btn-primary me-1">Upravit článek</a>
-                <a href="articles_delete.php?id=<?= $article['id'] ?>" class="btn btn-danger">Smazat článek</a>
+            <div class="mb-5 d-flex justify-content-between">
+                <div>
+                    <a href="index.php" class="btn btn-primary">Zpět na hlavní stránku</a>
+                </div>
+                <div>
+                    <a href="articles_edit.php?id=<?= $article['id'] ?>&redirect=articles_detail" class="btn btn-primary me-1">Upravit článek</a>
+                    <a href="articles_delete.php?id=<?= $article['id'] ?>" class="btn btn-danger">Smazat článek</a>
+                </div>
             </div>
-            <div class="ar_title mb-3">
+            <div class="display-5 fw-bold mb-4">
                 <?= $article['title'] ?>
             </div>
-            <div class="ar_category mb-1">
+            <div class="text-muted fw-semibold mb-1">
                 Kategorie:
                 <a href="categories_detail.php?id=<?= $article['cat_id'] ?>"><?= $article['category_name'] ?></a>
             </div>
-            <div class="ar_author_date mb-4">
+            <div class="text-muted fw-semibold mb-4">
                 <time>
-                    <?php
-                    $fmt = datefmt_create('cs-CZ', IntlDateFormatter::FULL, IntlDateFormatter::SHORT);
-                    echo $fmt->format(new DateTime($article['created_at']));
-                    ?>
+                    <?= DateUtils::DatumCesky($article['created_at']) ?>
                 </time>
                 <a href="authors_detail.php?id=<?= $article['author_id'] ?>"><?= $article['author_fullname'] ?></a>
             </div>
-            <div class="ar_introduction mb-3 fs-4 fw-semibold">
+            <hr class="border border-dark border-1 opacity-75 mb-4">
+            <div class="ar_introduction mb-3 fs-3 fw-bold">
                 <?= $article['introduction'] ?>
             </div>
         </div>
-        <main>
+        <div>
             <?= $article['content'] ?>
-        </main>
+        </div>
     </div>
 </div>
 

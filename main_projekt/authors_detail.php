@@ -3,6 +3,7 @@
 header('Cache-Control: no-store, no-cache, max-age=0, must-revalidate');
 
 require_once 'classes/Database.php';
+require_once 'classes/DateUtils.php';
 
 $db = new Database();
 
@@ -56,7 +57,7 @@ else {
     <div class="row flex-column">
         <div class="col-sm-9 col-lg-6">
             <?php if(empty($articles)): ?>
-                <h2>Autor nemá žádné články</h2>
+                <h2>Žádné veřejně dostupné články</h2>
             <?php else: ?>
                 <?php foreach ($articles as $article): ?>
                     <div class="card mb-5">
@@ -72,10 +73,7 @@ else {
                             </h6>
                             <h6 class="card-subtitle mb-3 text-muted">
                                 <time>
-                                    <?php
-                                    $fmt = datefmt_create('cs-CZ', IntlDateFormatter::FULL, IntlDateFormatter::SHORT);
-                                    echo $fmt->format(new DateTime($article['created_at']));
-                                    ?>
+                                    <?= DateUtils::DatumCesky($article['created_at']) ?>
                                 </time>
                             </h6>
                             <p class="card-text mb-3 fw-semibold fs-5">

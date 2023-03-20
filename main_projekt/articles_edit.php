@@ -50,6 +50,11 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
                 ':id' => $_GET['id'],
             ]);
 
+            if(!empty($_GET['redirect']) && $_GET['redirect'] == 'articles_detail') {
+                header('Location: articles_detail.php?article_id='.$_GET['id']);
+                die();
+            }
+
             header('Location: articles_list.php');
             die();
         }
@@ -135,7 +140,7 @@ else {
             </ul>
         <?php endif; ?>
         <div>
-            <form method="post" id="submitForm">
+            <form method="post">
                 <div class="mb-3">
                     <label>
                         Autor:

@@ -3,6 +3,7 @@
 header('Cache-Control: no-store, no-cache, max-age=0, must-revalidate');
 
 require_once 'classes/Database.php';
+require_once 'classes/DateUtils.php';
 
 $db = new Database();
 
@@ -72,10 +73,7 @@ if (isset($_GET['prevent_deletion_author_id']) && is_numeric($_GET['prevent_dele
                             <?= $author['articles_count_published'].' veřejné, '.$author['articles_count_not_published'].' skryté' ?>
                         </td>
                         <td>
-                            <?php
-                            $fmt = datefmt_create('cs-CZ', IntlDateFormatter::FULL, IntlDateFormatter::SHORT);
-                            echo $fmt->format(new DateTime($author['created_at']));
-                            ?>
+                            <?= DateUtils::DatumCesky($author['created_at']) ?>
                         </td>
                         <td class="text-end">
                             <a href="authors_edit.php?id=<?= $author['id'] ?>" class="btn btn-primary">Upravit</a>

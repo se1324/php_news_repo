@@ -3,6 +3,7 @@
 header('Cache-Control: no-store, no-cache, max-age=0, must-revalidate');
 
 require_once 'classes/Database.php';
+require_once 'classes/DateUtils.php';
 
 $db = new Database();
 
@@ -55,10 +56,7 @@ $articles = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         </h6>
                         <h6 class="card-subtitle mb-3 text-muted">
                             <time>
-                                <?php
-                                $fmt = datefmt_create('cs-CZ', IntlDateFormatter::FULL, IntlDateFormatter::SHORT);
-                                echo $fmt->format(new DateTime($article['created_at']));
-                                ?>
+                                <?= DateUtils::DatumCesky($article['created_at']) ?>
                             </time>
                             <a href="authors_detail.php?id=<?= $article['author_id'] ?>"><?= $article['author_fullname'] ?></a>
                         </h6>
