@@ -35,7 +35,7 @@ $articles = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <?php include_once 'reusable_components/navbar.php'; ?>
 
 <div class="container-fluid row justify-content-center">
-    <div class="col-7">
+    <div class="col-sm-10 col-lg-7">
         <div class="mb-4">
             <h1>Správa článků</h1>
         </div>
@@ -43,7 +43,7 @@ $articles = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <a href="articles_add.php" class="btn btn-success">Přidat článek</a>
         </div>
         <div>
-            <table class="table align-middle">
+            <table class="table align-middle table-responsive">
                 <thead class="table-dark">
                 <tr>
                     <th class="w-25">Titulek</th>

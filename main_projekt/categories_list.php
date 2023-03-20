@@ -35,7 +35,7 @@ if (isset($_GET['prevent_deletion_category_id']) && is_numeric($_GET['prevent_de
 <?php include_once 'reusable_components/navbar.php'; ?>
 
 <div class="container-fluid row justify-content-center">
-    <div class="col-7">
+    <div class="col-sm-10 col-lg-7">
         <?php if($showerror): ?>
             <div class="alert alert-danger" role="alert">
                 Nelze smazat kategorii s více než 0 články!
@@ -48,7 +48,7 @@ if (isset($_GET['prevent_deletion_category_id']) && is_numeric($_GET['prevent_de
             <a href="categories_add.php" class="btn btn-success">Přidat kategorii</a>
         </div>
         <div>
-            <table class="table align-middle">
+            <table class="table align-middle table-responsive">
                 <thead class="table-dark">
                 <tr>
                     <th>Název kategorie</th>

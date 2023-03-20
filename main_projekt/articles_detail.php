@@ -45,7 +45,7 @@ else {
 <?php include_once 'reusable_components/navbar.php'; ?>
 
 <div class="container-fluid row justify-content-center">
-    <div class="col-8">
+    <div class="col-sm-10 col-lg-8">
         <div class="mb-4">
             <div class="mb-4 d-flex justify-content-end">
                 <a href="articles_edit.php?id=<?= $article['id'] ?>" class="btn btn-primary me-1">Upravit článek</a>

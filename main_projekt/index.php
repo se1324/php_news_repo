@@ -35,7 +35,7 @@ $articles = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <?php include_once 'reusable_components/navbar.php'; ?>
 
 <div class="container-fluid row justify-content-center">
-    <div class="col-7">
+    <div class="col-sm-10 col-lg-7">
         <div class="mb-5 articles_title">
             <h1>Články</h1>
             <p>Nejnovější zprávy</p>

@@ -54,7 +54,7 @@ else {
     <h1 class="mb-4">Články autora: <?= $author['name'].' '.$author['surname'] ?></h1>
     <hr class="border border-dark border-2 opacity-75 mb-4">
     <div class="row flex-column">
-        <div class="col-6">
+        <div class="col-sm-9 col-lg-6">
             <?php if(empty($articles)): ?>
                 <h2>Autor nemá žádné články</h2>
             <?php else: ?>
