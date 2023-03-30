@@ -16,6 +16,11 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
     ]);
     $category = $stmt->fetch(PDO::FETCH_ASSOC);
 
+    if ($category == false) {
+        header('Location: categories_list.php');
+        die();
+    }
+
     $sql = 'SELECT a.*,CONCAT(ath.name, " ", ath.surname) as author_fullname from articles a 
             left join authors ath on a.author_id = ath.id
             where a.is_published = 1 and a.category_id = :category_id';

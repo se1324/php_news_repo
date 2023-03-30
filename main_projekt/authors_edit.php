@@ -1,45 +1,44 @@
 <?php
 
-require_once 'classes/Database.php';
-$db = new Database();
-
-if ($_SERVER['REQUEST_METHOD'] == 'POST'
-    && (isset($_GET['id']) && is_numeric($_GET['id']))) {
-
-    $errors = [];
-    if (empty($_POST['name'])) {
-        $errors[] = 'Jméno je povinné';
-    }
-    else {
-        if (strlen($_POST['name']) > 20) {
-            $errors[] = 'Jméno může mít max. 20 znaků';
-        }
-    }
-
-    if (empty($_POST['surname'])) {
-        $errors[] = 'Příjmení je povinné';
-    }
-    else {
-        if (strlen($_POST['name']) > 20) {
-            $errors[] = 'Příjmení může mít max. 20 znaků';
-        }
-    }
-
-    if (empty($errors)) {
-        $sql = 'UPDATE authors set name = :name, surname = :surname where id = :id';
-        $stmt = $db->conn->prepare($sql);
-        $stmt->execute([
-            ':name' => $_POST['name'],
-            ':surname' => $_POST['surname'],
-            ':id' => $_GET['id'],
-        ]);
-
-        header('Location: authors_list.php');
-        die();
-    }
-}
-
 if (isset($_GET['id']) && is_numeric($_GET['id'])) {
+
+    require_once 'classes/Database.php';
+    $db = new Database();
+
+    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+
+        $errors = [];
+        if (empty($_POST['name'])) {
+            $errors[] = 'Jméno je povinné';
+        }
+        else {
+            if (strlen($_POST['name']) > 20) {
+                $errors[] = 'Jméno může mít max. 20 znaků';
+            }
+        }
+
+        if (empty($_POST['surname'])) {
+            $errors[] = 'Příjmení je povinné';
+        }
+        else {
+            if (strlen($_POST['name']) > 20) {
+                $errors[] = 'Příjmení může mít max. 20 znaků';
+            }
+        }
+
+        if (empty($errors)) {
+            $sql = 'UPDATE authors set name = :name, surname = :surname where id = :id';
+            $stmt = $db->conn->prepare($sql);
+            $stmt->execute([
+                ':name' => $_POST['name'],
+                ':surname' => $_POST['surname'],
+                ':id' => $_GET['id'],
+            ]);
+
+            header('Location: authors_list.php');
+            die();
+        }
+    }
 
 
     $sql = 'select * from authors where id = :id';
@@ -48,6 +47,11 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
         ':id' => $_GET['id'],
     ]);
     $author = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($author == false) {
+        header('Location: authors_list.php');
+        die();
+    }
 }
 else {
     header('Location: authors_list.php');

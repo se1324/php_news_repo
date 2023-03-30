@@ -20,6 +20,11 @@ if (isset($_GET['article_id']) && is_numeric($_GET['article_id'])) {
     ]);
 
     $article = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($article == false) {
+        header('Location: index.php');
+        die();
+    }
 }
 else {
     header('Location: index.php');

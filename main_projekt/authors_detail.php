@@ -16,6 +16,12 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
     ]);
     $author = $stmt->fetch(PDO::FETCH_ASSOC);
 
+    if ($author == false) {
+        header('Location: authors_list.php');
+        die();
+    }
+
+
     $sql = 'SELECT a.*, c.id as cat_id, c.category_name from articles a 
             left join categories c on a.category_id = c.id
             where a.is_published = 1 and a.author_id = :author_id';

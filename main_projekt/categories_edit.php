@@ -1,36 +1,37 @@
 <?php
 
-require_once 'classes/Database.php';
-$db = new Database();
+if (isset($_GET['id']) && is_numeric($_GET['id']))
+{
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST'
-    && (isset($_GET['id']) && is_numeric($_GET['id']))) {
+    require_once 'classes/Database.php';
+    $db = new Database();
 
-    $errors = [];
-    if (empty($_POST['category_name'])) {
-        $errors[] = 'Název je povinný';
-    }
-    else {
-        if (strlen($_POST['category_name']) > 50) {
-            $errors[] = 'Název může mít max. 50 znaků';
+    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+
+        $errors = [];
+        if (empty($_POST['category_name'])) {
+            $errors[] = 'Název je povinný';
+        }
+        else {
+            if (strlen($_POST['category_name']) > 50) {
+                $errors[] = 'Název může mít max. 50 znaků';
+            }
+        }
+
+        if (empty($errors)) {
+            $sql = 'UPDATE categories set category_name = :name where id = :id';
+            $stmt = $db->conn->prepare($sql);
+            $stmt->execute([
+                ':name' => $_POST['category_name'],
+                ':id' => $_GET['id'],
+            ]);
+
+            header('Location: categories_list.php');
+            die();
         }
     }
 
-    if (empty($errors)) {
-        $sql = 'UPDATE categories set category_name = :name where id = :id';
-        $stmt = $db->conn->prepare($sql);
-        $stmt->execute([
-            ':name' => $_POST['category_name'],
-            ':id' => $_GET['id'],
-        ]);
 
-        header('Location: categories_list.php');
-        die();
-    }
-}
-
-if (isset($_GET['id']) && is_numeric($_GET['id']))
-{
 
     $sql = 'select * from categories where id = :id';
     $stmt = $db->conn->prepare($sql);
@@ -38,6 +39,11 @@ if (isset($_GET['id']) && is_numeric($_GET['id']))
         ':id' => $_GET['id'],
     ]);
     $category = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($category == false) {
+        header('Location: categories_list.php');
+        die();
+    }
 }
 else {
     header('Location: categories_list.php');
