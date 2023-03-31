@@ -35,6 +35,12 @@
                 echo "active";
             }
             ?>" href="login.php">Přihlásit se</a>
+            <a class="nav-link
+            <?php
+            if ($base == 'register') {
+                echo "active";
+            }
+            ?>" href="register.php">Registrace</a>
         </div>
     </div>
 </nav>

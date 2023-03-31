@@ -19,3 +19,15 @@
 - "Lidská" chybová zpráva při pokusu o smazání kategorie/autora s články
 - Dokončená grafika
 - Případné extra úkoly
+
+3. checkpoint
+- Dvě uživatelské role
+- - editor - může po registraci vytvářet, upravovat a mazat své články; ostatní upravovat nesmí
+- - admin - může po přihlášení editovat vše: kategorie, autory (editory), své i ostatní články
+- Registrace uživatele - nově zaregistrovaný uživatel má roli editor
+- Přihlášení - dle role v databázi budou uživateli zpřístupněny funkce
+- - V záhlaví webu se bude zobrazovat informace o přihlášeném uživateli
+- Odhlášení
+- Profil uživatele - po přihlášení může uživatel upravovat své údaje
+- - uživatel NEBUDE mít možnost si změnit roli
+- Vše ošetřit tak, aby ani přímým přístupem na URL adresu nemohl neoprávněný uživatel upravovat co nemá
