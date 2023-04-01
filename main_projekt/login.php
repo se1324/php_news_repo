@@ -1,3 +1,31 @@
+<?php
+
+require_once 'classes/AuthHandler.php';
+$auth = new AuthHandler();
+
+if ($auth->IsUserLoggedIn()) {
+    header('Location: index.php');
+    die();
+}
+
+$showBadLogin = false;
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+
+    if ($auth->Login($_POST['username'], $_POST['password'])) {
+        header('Location: index.php');
+        die();
+    }
+    else {
+        $showBadLogin = true;
+    }
+
+}
+
+?>
+
+
+
 <!doctype html>
 <html lang="en">
 <head>
@@ -8,7 +36,6 @@
     <title>Přihlásit se</title>
 
     <link rel="stylesheet" href="./bootstrap/css/bootstrap.min.css">
-    <link rel="stylesheet" href="./styles/index.css">
 </head>
 <body>
 
@@ -20,6 +47,11 @@
             <h1 class="mb-4 display-3 text-center">
                 Přihlásit se
             </h1>
+            <?php if ($showBadLogin): ?>
+            <div class="alert alert-danger mb-4">
+                Neplatné uživ. jméno nebo heslo
+            </div>
+            <?php endif; ?>
             <div class="mb-4">
                 <form method="post">
                     <div class="mb-3 d-flex justify-content-center">

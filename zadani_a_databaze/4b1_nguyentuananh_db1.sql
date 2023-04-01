@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Počítač: localhost
--- Vytvořeno: Čtv 30. bře 2023, 19:28
+-- Vytvořeno: Sob 01. dub 2023, 23:32
 -- Verze serveru: 10.3.25-MariaDB-0+deb10u1
 -- Verze PHP: 5.6.36-0+deb8u1
 
@@ -61,16 +61,28 @@ CREATE TABLE `authors` (
   `id` int(11) UNSIGNED NOT NULL,
   `name` varchar(20) COLLATE utf8_czech_ci NOT NULL,
   `surname` varchar(20) COLLATE utf8_czech_ci NOT NULL,
-  `created_at` datetime NOT NULL DEFAULT current_timestamp()
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `username` varchar(50) COLLATE utf8_czech_ci NOT NULL,
+  `password` varchar(255) COLLATE utf8_czech_ci NOT NULL,
+  `role_id` int(10) UNSIGNED DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_czech_ci;
 
 --
 -- Vypisuji data pro tabulku `authors`
 --
 
-INSERT INTO `authors` (`id`, `name`, `surname`, `created_at`) VALUES
-(1, 'Karel', 'Novákov', '2023-03-12 15:22:30'),
-(2, 'OndrejY', 'SvobodaYa', '2023-03-19 22:52:59');
+INSERT INTO `authors` (`id`, `name`, `surname`, `created_at`, `username`, `password`, `role_id`) VALUES
+(1, 'Karel', 'Novákov', '2023-03-12 15:22:30', 'karel', '$2y$10$.1QCHC.UgNwToMReZ4oblulLj4tX/VwQpxW6Dbsdshx3xW6vwwk3y', NULL),
+(2, 'OndrejY', 'SvobodaYa', '2023-03-19 22:52:59', 'ondrej', '$2y$10$.1QCHC.UgNwToMReZ4oblulLj4tX/VwQpxW6Dbsdshx3xW6vwwk3y', 4),
+(8, 'Davideaa', 'Statecna', '2023-04-01 21:42:59', 'david.statecny', '$2y$10$.1QCHC.UgNwToMReZ4oblulLj4tX/VwQpxW6Dbsdshx3xW6vwwk3y', 4);
+
+--
+-- Spouště `authors`
+--
+DELIMITER $$
+CREATE TRIGGER `Set_RoleId_After_Insert_Authors` BEFORE INSERT ON `authors` FOR EACH ROW set NEW.role_id = (select role_id from roles where role_name = 'editor')
+$$
+DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -107,10 +119,12 @@ CREATE TABLE `permissions` (
 --
 
 INSERT INTO `permissions` (`perm_id`, `perm_name`) VALUES
-(1, 'read'),
-(2, 'write'),
-(3, 'delete'),
-(4, 'full_access');
+(5, 'read_own'),
+(6, 'write_own'),
+(7, 'delete_own'),
+(8, 'read_all'),
+(9, 'write_all'),
+(10, 'delete_all');
 
 -- --------------------------------------------------------
 
@@ -150,7 +164,8 @@ CREATE TABLE `roles` (
 
 INSERT INTO `roles` (`role_id`, `role_name`) VALUES
 (1, 'admin'),
-(2, 'user');
+(2, 'user'),
+(4, 'editor');
 
 -- --------------------------------------------------------
 
@@ -170,21 +185,16 @@ CREATE TABLE `roles_perms` (
 --
 
 INSERT INTO `roles_perms` (`id`, `role_id`, `perm_id`, `resource_id`) VALUES
-(2, 1, 4, 5),
-(3, 2, 1, 5);
-
--- --------------------------------------------------------
-
---
--- Struktura tabulky `users`
---
-
-CREATE TABLE `users` (
-  `id` int(10) UNSIGNED NOT NULL,
-  `username` varchar(50) COLLATE utf8_czech_ci NOT NULL,
-  `password` varchar(255) COLLATE utf8_czech_ci NOT NULL COMMENT 'Zahashovaný plain text algoritmem BCRYPT',
-  `role_id` int(10) UNSIGNED NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_czech_ci;
+(4, 4, 5, 2),
+(5, 4, 6, 2),
+(6, 4, 7, 2),
+(7, 1, 5, 5),
+(8, 1, 6, 5),
+(9, 1, 7, 5),
+(10, 2, 5, 5),
+(11, 4, 8, 3),
+(12, 4, 9, 3),
+(13, 4, 10, 3);
 
 --
 -- Klíče pro exportované tabulky
@@ -202,7 +212,8 @@ ALTER TABLE `articles`
 -- Klíče pro tabulku `authors`
 --
 ALTER TABLE `authors`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `role_id` (`role_id`);
 
 --
 -- Klíče pro tabulku `categories`
@@ -238,13 +249,6 @@ ALTER TABLE `roles_perms`
   ADD KEY `resource_id` (`resource_id`);
 
 --
--- Klíče pro tabulku `users`
---
-ALTER TABLE `users`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `role_id` (`role_id`);
-
---
 -- AUTO_INCREMENT pro tabulky
 --
 
@@ -258,7 +262,7 @@ ALTER TABLE `articles`
 -- AUTO_INCREMENT pro tabulku `authors`
 --
 ALTER TABLE `authors`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT pro tabulku `categories`
@@ -270,7 +274,7 @@ ALTER TABLE `categories`
 -- AUTO_INCREMENT pro tabulku `permissions`
 --
 ALTER TABLE `permissions`
-  MODIFY `perm_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `perm_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT pro tabulku `resources`
@@ -282,19 +286,13 @@ ALTER TABLE `resources`
 -- AUTO_INCREMENT pro tabulku `roles`
 --
 ALTER TABLE `roles`
-  MODIFY `role_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `role_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT pro tabulku `roles_perms`
 --
 ALTER TABLE `roles_perms`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
-
---
--- AUTO_INCREMENT pro tabulku `users`
---
-ALTER TABLE `users`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- Omezení pro exportované tabulky
@@ -308,18 +306,18 @@ ALTER TABLE `articles`
   ADD CONSTRAINT `FK_article_category` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`);
 
 --
+-- Omezení pro tabulku `authors`
+--
+ALTER TABLE `authors`
+  ADD CONSTRAINT `authors_ibfk_1` FOREIGN KEY (`role_id`) REFERENCES `roles` (`role_id`) ON DELETE SET NULL ON UPDATE SET NULL;
+
+--
 -- Omezení pro tabulku `roles_perms`
 --
 ALTER TABLE `roles_perms`
   ADD CONSTRAINT `roles_perms_ibfk_1` FOREIGN KEY (`perm_id`) REFERENCES `permissions` (`perm_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `roles_perms_ibfk_2` FOREIGN KEY (`role_id`) REFERENCES `roles` (`role_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `roles_perms_ibfk_3` FOREIGN KEY (`resource_id`) REFERENCES `resources` (`resource_id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
--- Omezení pro tabulku `users`
---
-ALTER TABLE `users`
-  ADD CONSTRAINT `users_ibfk_1` FOREIGN KEY (`role_id`) REFERENCES `roles` (`role_id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

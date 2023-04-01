@@ -1,5 +1,46 @@
 <?php
 
+require_once 'classes/AuthHandler.php';
+$auth = new AuthHandler();
+
+if ($auth->IsUserLoggedIn()) {
+    header('Location: index.php');
+    die();
+}
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+
+    $errors = [];
+
+    if (!isset($_POST['name']) ||
+        (isset($_POST['name']) && strlen($_POST['name']) == 0)) {
+        $errors[] = "Jméno je povinné";
+    }
+
+    if (!isset($_POST['surname']) ||
+        (isset($_POST['surname']) && strlen($_POST['surname']) == 0)) {
+        $errors[] = "Příjmení je povinné";
+    }
+
+    if (!isset($_POST['username']) ||
+        (isset($_POST['username']) && strlen($_POST['username']) == 0)) {
+            $errors[] = "Uživ. jm. je povinné";
+        }
+
+    if (!isset($_POST['password']) ||
+        (isset($_POST['password']) && strlen($_POST['password']) == 0)) {
+        $errors[] = "Heslo je povinné";
+    }
+
+    if (empty($errors)) {
+
+        $auth->Register($_POST['username'], $_POST['password'], $_POST['name'], $_POST['surname']);
+
+        header('Location: index.php');
+        die();
+    }
+}
+
 
 ?>
 
@@ -15,7 +56,6 @@
     <title>Registrace</title>
 
     <link rel="stylesheet" href="./bootstrap/css/bootstrap.min.css">
-    <link rel="stylesheet" href="./styles/index.css">
 </head>
 <body>
 
@@ -27,16 +67,35 @@
             <h1 class="mb-4 display-3 text-center">
                 Registrace
             </h1>
+            <?php if (!empty($errors)): ?>
+            <div class="d-flex justify-content-center">
+                <ul>
+                    <?php foreach ($errors as $error): ?>
+                        <li><?= $error ?></li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+            <?php endif; ?>
             <div class="mb-4">
                 <form method="post">
                     <div class="mb-3 d-flex justify-content-center">
-                        <label class="form-label">Username
-                            <input type="text" class="form-control form-control-lg" name="username">
+                        <label class="form-label">Jméno
+                            <input type="text" class="form-control form-control-lg" name="name" required>
                         </label>
                     </div>
                     <div class="mb-3 d-flex justify-content-center">
-                        <label class="form-label">Password
-                            <input type="text" class="form-control form-control-lg" name="password">
+                        <label class="form-label">Příjmení
+                            <input type="text" class="form-control form-control-lg" name="surname" required>
+                        </label>
+                    </div>
+                    <div class="mb-3 d-flex justify-content-center">
+                        <label class="form-label">Nové uživatelské jméno
+                            <input type="text" class="form-control form-control-lg" name="username" required>
+                        </label>
+                    </div>
+                    <div class="mb-3 d-flex justify-content-center">
+                        <label class="form-label">Nové heslo
+                            <input type="text" class="form-control form-control-lg" name="password" required>
                         </label>
                     </div>
                     <div class="d-flex justify-content-center">
