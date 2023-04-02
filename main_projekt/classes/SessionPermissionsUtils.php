@@ -3,7 +3,9 @@
 class SessionPermissionsUtils
 {
     public static function CheckIfPermExistsOnResource(string $perm, string $resource): bool {
-        session_start();
+        if (!isset($_SESSION)) {
+            session_start();
+        }
 
         if (!isset($_SESSION['perms_data'][$resource])) {
             return false;

@@ -112,7 +112,51 @@ class AuthHandler
         return false;
     }
 
-    public function UpdateUserDetails(string $name, string $surname, string $username, string $password, bool $mustSetNewPassword): void {
+    public function UpdateUserDetails(string $userId, string $name, string $surname, string $username, string $password, bool $mustSetNewPassword): void {
+        if ($this->IsUserLoggedIn() && ($this->GetCurrentUserDetails()['user_id'] == $userId)) {
+            $this->UpdateLoggedInUserDetails($name, $surname, $username, $password, $mustSetNewPassword);
+            return;
+        }
+
+        $cleanName = trim($name);
+        $cleanSurname = trim($surname);
+        $cleanUsername = trim($username);
+
+        $db = new Database();
+
+        if ($mustSetNewPassword) {
+            $cleanPassword = trim($password);
+            $hashPassword = password_hash($cleanPassword, PASSWORD_BCRYPT);
+
+            $sql = 'Update authors set name = :name, surname = :surname, username = :username, password = :password
+                where id = :id';
+            $stmt = $db->conn->prepare($sql);
+            $stmt->execute([
+                ':name' => $cleanName,
+                ':surname' => $cleanSurname,
+                ':username' => $cleanUsername,
+                ':password' => $hashPassword,
+                ':id' => $userId,
+            ]);
+        }
+        else {
+            $sql = 'Update authors set name = :name, surname = :surname, username = :username
+                where id = :id';
+            $stmt = $db->conn->prepare($sql);
+            $stmt->execute([
+                ':name' => $cleanName,
+                ':surname' => $cleanSurname,
+                ':username' => $cleanUsername,
+                ':id' => $userId,
+            ]);
+        }
+    }
+
+    public function UpdateLoggedInUserDetails(string $name, string $surname, string $username, string $password, bool $mustSetNewPassword): void {
+        if (!$this->IsUserLoggedIn()) {
+            return;
+        }
+
         if (!isset($_SESSION)) {
             session_start();
         }
@@ -158,5 +202,12 @@ class AuthHandler
             session_start();
         }
         return $_SESSION;
+    }
+
+    public function CheckIfConnectionAllowed(): void {
+        if (!$this->IsUserLoggedIn()) {
+            header("Location: index.php");
+            die();
+        }
     }
 }

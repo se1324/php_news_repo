@@ -1,6 +1,8 @@
 <?php
-
-require_once 'classes/PermissionsUtils.php';
+require_once 'classes/AuthHandler.php';
+$auth = new AuthHandler();
+$auth->CheckIfConnectionAllowed();
+require_once 'classes/SessionPermissionsUtils.php';
 require_once 'classes/Database.php';
 
 $db = new Database();

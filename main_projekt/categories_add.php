@@ -1,7 +1,17 @@
 <?php
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+require_once 'classes/AuthHandler.php';
+$auth = new AuthHandler();
+$auth->CheckIfConnectionAllowed();
 
+require_once 'classes/SessionPermissionsUtils.php';
+
+if (!SessionPermissionsUtils::CheckIfPermExistsOnResource('create', 'categories')) {
+    header('Location: categories_list.php');
+    die();
+}
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     require_once 'classes/Database.php';
     $db = new Database();

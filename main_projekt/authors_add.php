@@ -1,5 +1,16 @@
 <?php
 
+require_once 'classes/AuthHandler.php';
+$auth = new AuthHandler();
+$auth->CheckIfConnectionAllowed();
+
+require_once 'classes/SessionPermissionsUtils.php';
+
+if (!SessionPermissionsUtils::CheckIfPermExistsOnResource('create', 'authors')) {
+    header('Location: authors_list.php');
+    die();
+}
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     require_once 'classes/Database.php';
@@ -24,14 +35,28 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     }
 
+    if (empty($_POST['username'])) {
+        $errors[] = 'Uživ.jm. je povinné';
+    }
+    else {
+        if (strlen($_POST['username']) > 50) {
+            $errors[] = 'Uživ.jm. může mít max. 50 znaků';
+        }
+    }
+
+    if (empty($_POST['password'])) {
+        $errors[] = 'Heslo je povinné';
+    }
+    else {
+        if (strlen($_POST['password']) > 20) {
+            $errors[] = 'Heslo může mít max. 20 znaků';
+        }
+    }
+
     if (empty($errors)) {
-        $sql = 'INSERT into authors (name, surname, created_at) 
-            values (:name, :surname, default)';
-        $stmt = $db->conn->prepare($sql);
-        $stmt->execute([
-            ':name' => $_POST['name'],
-            ':surname' => $_POST['surname'],
-        ]);
+        require_once 'classes/UserUtils.php';
+
+        UserUtils::CreateNewUser($_POST['name'], $_POST['surname'], $_POST['username'], $_POST['password']);
 
         header('Location: authors_list.php');
         die();
@@ -69,15 +94,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <div>
             <form method="post">
                 <div class="mb-3">
-                    <label>
-                        Jméno:
-                        <input type="text" class="form-control" name="name" required maxlength="20">
+                    <label class="form-label">Jméno
+                        <input type="text" class="form-control" name="name" required>
                     </label>
                 </div>
                 <div class="mb-3">
-                    <label>
-                        Příjmení:
-                        <input type="text" class="form-control" name="surname" required maxlength="20">
+                    <label class="form-label">Příjmení
+                        <input type="text" class="form-control" name="surname" required>
+                    </label>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Uživatelské jméno
+                        <input type="text" class="form-control" name="username" required>
+                    </label>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Heslo
+                        <input type="text" class="form-control" name="password" required>
                     </label>
                 </div>
                 <button type="submit" class="btn btn-primary">Přidat</button>

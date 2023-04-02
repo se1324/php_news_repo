@@ -11,15 +11,25 @@ if ($auth->IsUserLoggedIn()) {
 $showBadLogin = false;
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $errors = [];
 
-    if ($auth->Login($_POST['username'], $_POST['password'])) {
-        header('Location: index.php');
-        die();
-    }
-    else {
-        $showBadLogin = true;
+    if (!empty($_POST['username']) && strlen($_POST['username']) > 50) {
+        $errors[] = 'Uživ.jm. může mít max. 50 znaků';
     }
 
+    if (!empty($_POST['password']) && strlen($_POST['password']) > 20) {
+        $errors[] = 'Heslo může mít max. 20 znaků';
+    }
+
+    if (empty($errors)) {
+        if ($auth->Login($_POST['username'], $_POST['password'])) {
+            header('Location: index.php');
+            die();
+        }
+        else {
+            $showBadLogin = true;
+        }
+    }
 }
 
 ?>
@@ -51,6 +61,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <div class="alert alert-danger mb-4">
                 Neplatné uživ. jméno nebo heslo
             </div>
+            <?php endif; ?>
+            <?php if (!empty($errors)): ?>
+            <ul>
+                <?php foreach ($errors as $error): ?>
+                    <li><?= $error ?></li>
+                <?php endforeach; ?>
+            </ul>
             <?php endif; ?>
             <div class="mb-4">
                 <form method="post">

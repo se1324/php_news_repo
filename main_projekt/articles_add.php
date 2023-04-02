@@ -1,14 +1,22 @@
 <?php
 
+require_once 'classes/AuthHandler.php';
+$auth = new AuthHandler();
+$auth->CheckIfConnectionAllowed();
+
+require_once 'classes/SessionPermissionsUtils.php';
+
+if (!SessionPermissionsUtils::CheckIfPermExistsOnResource('create', 'articles')) {
+    header('Location: articles_list.php');
+    die();
+}
+
 require_once 'classes/Database.php';
 $db = new Database();
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     $errors = [];
-    if (empty($_POST['author_id'])) {
-        $errors[] = 'Vyberte autora';
-    }
 
     if (empty($_POST['category_id'])) {
         $errors[] = 'Vyberte kategorii';
@@ -38,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
           values (:author_id, :category_id, :title, :introduction, :content, :is_published, default)';
         $stmt = $db->conn->prepare($sql);
         $stmt->execute([
-            ':author_id' => $_POST['author_id'],
+            ':author_id' => $auth->GetCurrentUserDetails()['user_id'],
             ':category_id' => $_POST['category_id'],
             ':title' => $_POST['title'],
             ':introduction' => $_POST['introduction'],
@@ -52,10 +60,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 }
 
 
-$sql = 'select * from authors';
+$sql = 'select * from authors where id = :id';
 $stmt = $db->conn->prepare($sql);
-$stmt->execute();
-$authors = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$stmt->execute([
+    ':id' => $auth->GetCurrentUserDetails()['user_id'],
+]);
+$author = $stmt->fetch(PDO::FETCH_ASSOC);
 
 $sql = 'select * from categories';
 $stmt = $db->conn->prepare($sql);
@@ -122,14 +132,7 @@ $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <div class="mb-3">
                     <label>
                         Autor:
-                        <select name="author_id" class="form-select" required>
-                            <option value="" selected>Vyberte autora</option>
-                            <?php foreach ($authors as $author): ?>
-                                <option value="<?= $author['id'] ?>">
-                                    <?= $author['name'].' '.$author['surname'] ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
+                        <input type="text" class="form-control" value="<?= $author['name'].' '.$author['surname'] ?>" disabled readonly>
                     </label>
                 </div>
                 <div class="mb-3">
