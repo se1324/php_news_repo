@@ -1,6 +1,14 @@
 <?php
 
+//TATO STRÁNKA JE PRO ANONYMNÍ PŘÍSTUP JEN KE ČTENÍ
+//TATO STRÁNKA JE PRO ANONYMNÍ PŘÍSTUP JEN KE ČTENÍ
+//TATO STRÁNKA JE PRO ANONYMNÍ PŘÍSTUP JEN KE ČTENÍ
+
 header('Cache-Control: no-store, no-cache, max-age=0, must-revalidate');
+
+require_once 'classes/SessionPermissionsUtils.php';
+require_once 'classes/AuthHandler.php';
+$auth = new AuthHandler();
 
 require_once 'classes/Database.php';
 require_once 'classes/DateUtils.php';
@@ -58,8 +66,22 @@ else {
                     <a href="index.php" class="btn btn-primary">Zpět na hlavní stránku</a>
                 </div>
                 <div>
-                    <a href="articles_edit.php?id=<?= $article['id'] ?>&redirect=articles_detail" class="btn btn-primary me-1">Upravit článek</a>
-                    <a href="articles_delete.php?id=<?= $article['id'] ?>" class="btn btn-danger">Smazat článek</a>
+                    <?php
+                        $canEdit =
+                            ((SessionPermissionsUtils::CheckIfPermExistsOnResource('write_own', 'articles')
+                                && $article['author_id'] == $auth->GetCurrentUserDetails()['user_id'])
+                            || SessionPermissionsUtils::CheckIfPermExistsOnResource('write_all', 'articles'));
+                        $canDelete =
+                            ((SessionPermissionsUtils::CheckIfPermExistsOnResource('delete_own', 'articles')
+                                && $article['author_id'] == $auth->GetCurrentUserDetails()['user_id'])
+                            || SessionPermissionsUtils::CheckIfPermExistsOnResource('delete_all', 'articles'));
+                    ?>
+                    <?php if ($canEdit): ?>
+                        <a href="articles_edit.php?id=<?= $article['id'] ?>&redirect=articles_detail" class="btn btn-primary me-1">Upravit článek</a>
+                    <?php endif; ?>
+                    <?php if ($canDelete): ?>
+                        <a href="articles_delete.php?id=<?= $article['id'] ?>" class="btn btn-danger">Smazat článek</a>
+                    <?php endif; ?>
                 </div>
             </div>
             <div class="display-5 fw-bold mb-4">

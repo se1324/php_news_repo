@@ -1,5 +1,9 @@
 <?php
 
+//TATO STRÁNKA JE PRO ANONYMNÍ PŘÍSTUP JEN KE ČTENÍ
+//TATO STRÁNKA JE PRO ANONYMNÍ PŘÍSTUP JEN KE ČTENÍ
+//TATO STRÁNKA JE PRO ANONYMNÍ PŘÍSTUP JEN KE ČTENÍ
+
 header('Cache-Control: no-store, no-cache, max-age=0, must-revalidate');
 
 require_once 'classes/Database.php';
