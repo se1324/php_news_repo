@@ -54,14 +54,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <div class="container-fluid py-3">
     <div class="row justify-content-center">
         <div class="col-6">
+            <?php if ($showBadLogin): ?>
+                <div class="alert alert-danger mb-4">
+                    Neplatné uživ. jméno nebo heslo
+                </div>
+            <?php endif; ?>
             <h1 class="mb-4 display-3 text-center">
                 Přihlásit se
             </h1>
-            <?php if ($showBadLogin): ?>
-            <div class="alert alert-danger mb-4">
-                Neplatné uživ. jméno nebo heslo
-            </div>
-            <?php endif; ?>
             <?php if (!empty($errors)): ?>
             <ul>
                 <?php foreach ($errors as $error): ?>

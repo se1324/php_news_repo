@@ -22,6 +22,7 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
     if ($canWrite)
     {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            unset($_GET['showsuccess']);
             $errors = [];
 
             if (!isset($_POST['name']) ||
@@ -54,7 +55,7 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
 
                 $auth->UpdateUserDetails($_GET['id'], $_POST['name'], $_POST['surname'], $_POST['username'], $_POST['password'], $setNewPassword);
 
-                header('Location: profile.php');
+                header('Location: profile.php?showsuccess=1&id='.$_GET['id']);
                 die();
             }
         }
@@ -105,6 +106,11 @@ else {
     <h1 class="mb-4">Profil uživatele: <?= $userInfo['name'].' '.$userInfo['surname'] ?></h1>
     <hr class="border border-dark border-2 opacity-75 mb-4">
     <div class="mb-4">
+        <?php if (isset($_GET['showsuccess']) && $_GET['showsuccess'] == 1): ?>
+            <div class="alert alert-success">
+                Změna proběhla úspěšně!
+            </div>
+        <?php endif; ?>
         <h2 class="mb-4">Osobní údaje</h2>
         <?php if (!empty($errors)): ?>
             <div class="mb-4">
@@ -136,10 +142,10 @@ else {
                     <div class="mb-3">
                         <label class="form-check-label">
                             <input class="form-check-input" type="checkbox" id="hasNewPassword" name="has_new_password" value="1">
-                            Upravit heslo
+                            Chci změnit heslo
                         </label>
                     </div>
-                    <div class="mb-3" id="passwordFieldContainer" style="display: none;">
+                    <div class="mb-3" id="passwordFieldContainer">
                         <label class="form-label">Nové heslo
                             <input type="text" class="form-control form-control-lg" id="newPasswordField" name="password" placeholder="Vyplňte nové heslo">
                         </label>
@@ -180,6 +186,8 @@ else {
         const passwordCheck = document.getElementById('hasNewPassword');
         const passwordInput = document.getElementById('newPasswordField');
         const passwordContainer = document.getElementById('passwordFieldContainer');
+
+        passwordContainer.style.display = 'none';
 
         passwordCheck.addEventListener('change', function () {
             if (this.checked) {
