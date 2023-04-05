@@ -60,7 +60,8 @@ $currentUserInfo = $auth->GetCurrentUserDetails();
                     ?>" href="register.php">Registrace</a>
             <?php endif; ?>
             <?php if (isset($currentUserInfo['logged_in']) && $currentUserInfo['logged_in'] == true): ?>
-                <?php if (SessionPermissionsUtils::CheckIfPermExistsOnResource('read_own', 'profiles')): ?>
+                <?php if (SessionPermissionsUtils::CheckIfPermExistsOnResource('read_own', 'profiles')
+                        || SessionPermissionsUtils::CheckIfPermExistsOnResource('read_all', 'profiles')): ?>
                 <a href="profile.php?id=<?= $currentUserInfo['user_id']?>" class="btn btn-success d-flex justify-content-between align-items-center gap-2 me-2 fw-bold">
                     <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16">
                         <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>

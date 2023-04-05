@@ -6,6 +6,10 @@
 
 header('Cache-Control: no-store, no-cache, max-age=0, must-revalidate');
 
+require_once 'classes/SessionPermissionsUtils.php';
+require_once 'classes/AuthHandler.php';
+$auth = new AuthHandler();
+
 require_once 'classes/Database.php';
 require_once 'classes/DateUtils.php';
 
@@ -62,7 +66,18 @@ else {
 <?php include_once 'reusable_components/navbar.php'; ?>
 
 <div class="container-fluid px-5">
-    <h1 class="mb-4">Články autora: <?= $author['name'].' '.$author['surname'] ?></h1>
+    <div class="mb-4 d-flex justify-content-between">
+        <h1>Články autora: <?= $author['name'].' '.$author['surname'] ?></h1>
+
+        <?php
+            $canReadProfile = $auth->IsUserLoggedIn() && (SessionPermissionsUtils::CheckIfPermExistsOnResource('read_own', 'profiles')
+                && $author['id'] == $auth->GetCurrentUserDetails()['user_id'])
+                || SessionPermissionsUtils::CheckIfPermExistsOnResource('read_all', 'profiles');
+        ?>
+        <?php if($canReadProfile): ?>
+            <a class="btn btn-primary d-flex align-items-center" href="profile.php?id=<?= $author['id'] ?>">Zobrazit profil</a>
+        <?php endif; ?>
+    </div>
     <hr class="border border-dark border-2 opacity-75 mb-4">
     <div class="row flex-column">
         <div class="col-sm-9 col-lg-6">

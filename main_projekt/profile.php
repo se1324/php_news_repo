@@ -10,7 +10,8 @@ $auth->CheckIfConnectionAllowed();
 if (isset($_GET['id']) && is_numeric($_GET['id'])) {
     if (!((SessionPermissionsUtils::CheckIfPermExistsOnResource('read_own', 'profiles')
         && $_GET['id'] == $auth->GetCurrentUserDetails()['user_id'])
-        || SessionPermissionsUtils::CheckIfPermExistsOnResource('read_all', 'profiles'))) {
+        || SessionPermissionsUtils::CheckIfPermExistsOnResource('read_all', 'profiles')))
+    {
         header('Location: index.php');
         die();
     }
