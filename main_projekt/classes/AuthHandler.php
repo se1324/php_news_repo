@@ -58,6 +58,10 @@ class AuthHandler
     }
 
     public function Logout(): void {
+        if (!$this->IsUserLoggedIn()) {
+            return;
+        }
+
         if (!isset($_SESSION)) {
             session_start();
         }

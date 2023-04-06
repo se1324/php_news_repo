@@ -6,8 +6,8 @@ $auth->CheckIfConnectionAllowed();
 
 require_once 'classes/SessionPermissionsUtils.php';
 
-if (!SessionPermissionsUtils::CheckIfPermExistsOnResource('create', 'authors')) {
-    header('Location: authors_list.php');
+if (!SessionPermissionsUtils::CheckIfPermExistsOnResource('create', 'profiles')) {
+    header('Location: authors_list.php?alert_type=3&alert_message=Neoprávněný přístup');
     die();
 }
 
@@ -58,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         UserUtils::CreateNewUser($_POST['name'], $_POST['surname'], $_POST['username'], $_POST['password']);
 
-        header('Location: authors_list.php');
+        header('Location: authors_list.php?alert_type=1&alert_message=Změna proběhla úspěšně');
         die();
     }
 }

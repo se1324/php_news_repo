@@ -7,7 +7,7 @@ $auth->CheckIfConnectionAllowed();
 require_once 'classes/SessionPermissionsUtils.php';
 
 if (!SessionPermissionsUtils::CheckIfPermExistsOnResource('create', 'categories')) {
-    header('Location: categories_list.php');
+    header('Location: categories_list.php?alert_type=3&alert_message=Neoprávněný přístup');
     die();
 }
 
@@ -34,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             ':name' => $_POST['category_name'],
         ]);
 
-        header('Location: categories_list.php');
+        header('Location: categories_list.php?alert_type=1&alert_message=Změna proběhla úspěšně');
         die();
     }
 }

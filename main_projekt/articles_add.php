@@ -7,7 +7,7 @@ $auth->CheckIfConnectionAllowed();
 require_once 'classes/SessionPermissionsUtils.php';
 
 if (!SessionPermissionsUtils::CheckIfPermExistsOnResource('create', 'articles')) {
-    header('Location: articles_list.php');
+    header('Location: articles_list.php?alert_type=3&alert_message=Neoprávněný přístup');
     die();
 }
 
@@ -54,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             ':is_published' => $is_published,
         ]);
 
-        header('Location: articles_list.php');
+        header('Location: articles_list.php?alert_type=1&alert_message=Změna proběhla úspěšně');
         die();
     }
 }

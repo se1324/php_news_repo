@@ -2,23 +2,29 @@
 
 header('Cache-Control: no-store, no-cache, max-age=0, must-revalidate');
 
+require_once 'classes/AlertUtils.php';
+
 require_once 'classes/Database.php';
 require_once 'classes/DateUtils.php';
+
+require_once 'classes/SessionPermissionsUtils.php';
+require_once 'classes/AuthHandler.php';
+$auth = new AuthHandler();
 
 $db = new Database();
 
 $sql = 'SELECT *, 
         (select count(*) from articles where author_id = ath.id and is_published = 1) as articles_count_published,
-        (select count(*) from articles where author_id = ath.id and is_published = 0) as articles_count_not_published
-        from authors ath';
+        (select count(*) from articles where author_id = ath.id and is_published = 0) as articles_count_not_published,
+        case ath.id when :current_user_id then 1 else 0 end as OWNED_BY_CURRENT_USER
+        from authors ath
+        order by OWNED_BY_CURRENT_USER DESC';
 $stmt = $db->conn->prepare($sql);
-$stmt->execute();
+$stmt->execute([
+        ':current_user_id' => $auth->GetCurrentUserDetails()['user_id'],
+]);
 $authors = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-$showerror = false;
-if (isset($_GET['prevent_deletion_author_id']) && is_numeric($_GET['prevent_deletion_author_id'])) {
-    $showerror = true;
-}
 ?>
 
 
@@ -40,16 +46,27 @@ if (isset($_GET['prevent_deletion_author_id']) && is_numeric($_GET['prevent_dele
 
 <div class="container-fluid row justify-content-center">
     <div class="col-sm-10 col-lg-7">
-        <?php if($showerror): ?>
-        <div class="alert alert-danger" role="alert">
-            Nelze smazat autora s více než 0 články!
-        </div>
-        <?php endif; ?>
+
+        <?php
+        if (isset($_GET['alert_type'], $_GET['alert_message']) &&
+            is_numeric($_GET['alert_type']) && is_string($_GET['alert_message']))
+        {
+            AlertUtils::CreateAlert($_GET['alert_type'], $_GET['alert_message']);
+        }
+        ?>
+
         <div class="mb-4">
             <h1>Seznam autorů</h1>
         </div>
         <div class="mb-3 d-flex justify-content-end">
-            <a href="authors_add.php" class="btn btn-success">Přidat autora</a>
+            <?php
+                $canCreateProfile =
+                    SessionPermissionsUtils::CheckIfPermExistsOnResource('create', 'profiles');
+            ?>
+
+            <?php if($canCreateProfile): ?>
+                <a href="authors_add.php" class="btn btn-success">Přidat autora</a>
+            <?php endif; ?>
         </div>
         <div>
             <table class="table align-middle table-responsive">
@@ -76,8 +93,25 @@ if (isset($_GET['prevent_deletion_author_id']) && is_numeric($_GET['prevent_dele
                             <?= DateUtils::DatumCesky($author['created_at']) ?>
                         </td>
                         <td class="text-end">
-                            <a href="authors_edit.php?id=<?= $author['id'] ?>" class="btn btn-primary">Upravit</a>
-                            <a href="authors_delete.php?id=<?= $author['id'] ?>" class="btn btn-danger">Smazat</a>
+                            <?php
+                                $canReadProfile =
+                                    (SessionPermissionsUtils::CheckIfPermExistsOnResource('read_own', 'profiles')
+                                    && $author['OWNED_BY_CURRENT_USER'] == 1)
+                                    || SessionPermissionsUtils::CheckIfPermExistsOnResource('read_all', 'profiles');
+
+                                $canDeleteProfile =
+                                    (SessionPermissionsUtils::CheckIfPermExistsOnResource('delete_own', 'profiles')
+                                        && $author['OWNED_BY_CURRENT_USER'] == 1)
+                                    || SessionPermissionsUtils::CheckIfPermExistsOnResource('delete_all', 'profiles');
+                            ?>
+
+                            <?php if ($canReadProfile): ?>
+                                <a href="profile.php?id=<?= $author['id'] ?>" class="btn btn-primary">Zobrazit profil</a>
+                            <?php endif; ?>
+
+                            <?php if ($canDeleteProfile): ?>
+                                <a href="authors_delete.php?id=<?= $author['id'] ?>" class="btn btn-danger">Smazat</a>
+                            <?php endif; ?>
                         </td>
                     </tr>
                 <?php endforeach; ?>

@@ -70,7 +70,7 @@ else {
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Úprava autora</title>
 
-    <link rel="stylesheet" href="./bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../bootstrap/css/bootstrap.min.css">
 </head>
 <body>
 
@@ -109,6 +109,6 @@ else {
 
 
 
-<script src="./bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="../bootstrap/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

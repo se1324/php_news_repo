@@ -1,16 +1,35 @@
 <?php
 
+require_once 'classes/AuthHandler.php';
+$auth = new AuthHandler();
+$auth->CheckIfConnectionAllowed();
+
+require_once 'classes/SessionPermissionsUtils.php';
+
 if (isset($_GET['id']) && is_numeric($_GET['id'])) {
 
     require_once 'classes/Database.php';
     $db = new Database();
 
+    $sql = 'select author_id from articles where id = :id';
+    $stmt = $db->conn->prepare($sql);
+    $stmt->execute([
+       ':id' => $_GET['id'],
+    ]);
+    $authorId = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    $canEdit = (SessionPermissionsUtils::CheckIfPermExistsOnResource('write_own', 'articles')
+        && $authorId['author_id'] == $auth->GetCurrentUserDetails()['user_id'])
+        || SessionPermissionsUtils::CheckIfPermExistsOnResource('write_all', 'articles');
+
+    if (!$canEdit) {
+        header('Location: articles_list.php?alert_type=3&alert_message=Neoprávněný přístup');
+        die;
+    }
+
     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         $errors = [];
-        if (empty($_POST['author_id'])) {
-            $errors[] = 'Vyberte autora';
-        }
 
         if (empty($_POST['category_id'])) {
             $errors[] = 'Vyberte kategorii';
@@ -36,12 +55,11 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
                 $is_published = 1;
             }
 
-            $sql = 'Update articles set author_id = :author_id, category_id = :category_id, title = :title,
-                    introduction = :introduction, content = :content, is_published = :is_published
-                    where id = :id';
+            $sql = 'Update articles set category_id = :category_id, title = :title,
+                introduction = :introduction, content = :content, is_published = :is_published
+                where id = :id';
             $stmt = $db->conn->prepare($sql);
             $stmt->execute([
-                ':author_id' => $_POST['author_id'],
                 ':category_id' => $_POST['category_id'],
                 ':title' => $_POST['title'],
                 ':introduction' => $_POST['introduction'],
@@ -55,22 +73,23 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
                 die();
             }
 
-            header('Location: articles_list.php');
+            header('Location: articles_list.php?alert_type=1&alert_message=Změna proběhla úspěšně');
             die();
         }
     }
 
 
-    $sql = 'select * from authors';
+    $sql = 'select * from authors where id = :id';
     $stmt = $db->conn->prepare($sql);
-    $stmt->execute();
-    $authors = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $stmt->execute([
+        ':id' => $authorId['author_id'],
+    ]);
+    $author = $stmt->fetch(PDO::FETCH_ASSOC);
 
     $sql = 'select * from categories';
     $stmt = $db->conn->prepare($sql);
     $stmt->execute();
     $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
 
     $sql = 'select * from articles where id = :id';
     $stmt = $db->conn->prepare($sql);
@@ -80,12 +99,12 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
     $article = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($article == false) {
-        header('Location: articles_list.php');
+        header('Location: articles_list.php?alert_type=3&alert_message=Položka neexistuje');
         die();
     }
 }
 else {
-    header('Location: articles_list.php');
+    header('Location: articles_list.php?alert_type=2&alert_message=Neplatný odkaz');
     die();
 }
 
@@ -149,20 +168,7 @@ else {
                 <div class="mb-3">
                     <label>
                         Autor:
-                        <select name="author_id" class="form-select" required>
-                            <option value="" selected>Vyberte autora</option>
-                            <?php foreach ($authors as $author): ?>
-                                <option value="<?= $author['id'] ?>"
-                                <?php
-                                    if ($author['id'] == $article['author_id']) {
-                                        echo 'selected';
-                                    }
-                                ?>
-                                >
-                                    <?= $author['name'].' '.$author['surname'] ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
+                        <input type="text" class="form-control" value="<?= $author['name'].' '.$author['surname'] ?>" disabled readonly>
                     </label>
                 </div>
                 <div class="mb-3">

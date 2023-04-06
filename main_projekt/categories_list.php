@@ -2,7 +2,10 @@
 
 header('Cache-Control: no-store, no-cache, max-age=0, must-revalidate');
 
+require_once 'classes/AlertUtils.php';
+
 require_once 'classes/Database.php';
+require_once 'classes/SessionPermissionsUtils.php';
 
 $db = new Database();
 
@@ -10,11 +13,6 @@ $sql = 'SELECT ctg.*, (select count(*) from articles where category_id = ctg.id)
 $stmt = $db->conn->prepare($sql);
 $stmt->execute();
 $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-$showerror = false;
-if (isset($_GET['prevent_deletion_category_id']) && is_numeric($_GET['prevent_deletion_category_id'])) {
-    $showerror = true;
-}
 ?>
 
 
@@ -36,16 +34,27 @@ if (isset($_GET['prevent_deletion_category_id']) && is_numeric($_GET['prevent_de
 
 <div class="container-fluid row justify-content-center">
     <div class="col-sm-10 col-lg-7">
-        <?php if($showerror): ?>
-            <div class="alert alert-danger" role="alert">
-                Nelze smazat kategorii s více než 0 články!
-            </div>
-        <?php endif; ?>
+
+        <?php
+        if (isset($_GET['alert_type'], $_GET['alert_message']) &&
+            is_numeric($_GET['alert_type']) && is_string($_GET['alert_message']))
+        {
+            AlertUtils::CreateAlert($_GET['alert_type'], $_GET['alert_message']);
+        }
+        ?>
+
         <div class="mb-4">
             <h1>Seznam kategorií</h1>
         </div>
         <div class="mb-3 d-flex justify-content-end">
-            <a href="categories_add.php" class="btn btn-success">Přidat kategorii</a>
+            <?php
+                $canCreateCategories =
+                    SessionPermissionsUtils::CheckIfPermExistsOnResource('create', 'categories');
+            ?>
+
+            <?php if ($canCreateCategories): ?>
+                <a href="categories_add.php" class="btn btn-success">Přidat kategorii</a>
+            <?php endif; ?>
         </div>
         <div>
             <table class="table align-middle table-responsive">
@@ -64,8 +73,21 @@ if (isset($_GET['prevent_deletion_category_id']) && is_numeric($_GET['prevent_de
                             </a>
                         </td>
                         <td class="text-end">
-                            <a href="categories_edit.php?id=<?= $category['id'] ?>" class="btn btn-primary">Upravit</a>
-                            <a href="categories_delete.php?id=<?= $category['id'] ?>" class="btn btn-danger">Smazat</a>
+                            <?php
+                                $canEditCategories =
+                                    SessionPermissionsUtils::CheckIfPermExistsOnResource('write_all', 'categories');
+
+                                $canDeleteCategories =
+                                    SessionPermissionsUtils::CheckIfPermExistsOnResource('delete_all', 'categories');
+                            ?>
+
+                            <?php if ($canEditCategories): ?>
+                                <a href="categories_edit.php?id=<?= $category['id'] ?>" class="btn btn-primary">Upravit</a>
+                            <?php endif; ?>
+
+                            <?php if ($canDeleteCategories): ?>
+                                <a href="categories_delete.php?id=<?= $category['id'] ?>" class="btn btn-danger">Smazat</a>
+                            <?php endif; ?>
                         </td>
                     </tr>
                 <?php endforeach; ?>

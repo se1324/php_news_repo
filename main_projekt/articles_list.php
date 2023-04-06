@@ -2,20 +2,29 @@
 
 header('Cache-Control: no-store, no-cache, max-age=0, must-revalidate');
 
+require_once 'classes/AlertUtils.php';
+
 require_once 'classes/Database.php';
 require_once 'classes/DateUtils.php';
+
+require_once 'classes/SessionPermissionsUtils.php';
+require_once 'classes/AuthHandler.php';
+$auth = new AuthHandler();
 
 $db = new Database();
 
 $sql = 'select a.id, a.title, a.is_published, a.created_at,
         ath.id as author_id, concat(ath.name, " ", ath.surname) as author_fullname,
-        c.id as category_id, c.category_name
+        c.id as category_id, c.category_name,
+        case ath.id when :my_id then 1 else 0 end as OWNED_BY_CURRENT_USER
         from articles a
         left join authors ath on a.author_id = ath.id
         left join categories c on a.category_id = c.id
-        order by a.title asc';
+        order by OWNED_BY_CURRENT_USER DESC, a.title asc';
 $stmt = $db->conn->prepare($sql);
-$stmt->execute();
+$stmt->execute([
+        ':my_id' => $auth->GetCurrentUserDetails()['user_id'],
+]);
 $articles = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
@@ -37,11 +46,26 @@ $articles = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 <div class="container-fluid row justify-content-center">
     <div class="col-sm-10 col-lg-7">
+
+        <?php
+            if (isset($_GET['alert_type'], $_GET['alert_message']) &&
+                is_numeric($_GET['alert_type']) && is_string($_GET['alert_message']))
+            {
+                AlertUtils::CreateAlert($_GET['alert_type'], $_GET['alert_message']);
+            }
+        ?>
+
         <div class="mb-4">
             <h1>Správa článků</h1>
         </div>
         <div class="mb-3 d-flex justify-content-end">
-            <a href="articles_add.php" class="btn btn-success">Přidat článek</a>
+            <?php
+                $canCreateArticles = SessionPermissionsUtils::CheckIfPermExistsOnResource('create', 'articles');
+            ?>
+
+            <?php if ($canCreateArticles): ?>
+                <a href="articles_add.php" class="btn btn-success">Přidat článek</a>
+            <?php endif; ?>
         </div>
         <div>
             <table class="table align-middle table-responsive">
@@ -87,8 +111,25 @@ $articles = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             ?>
                         </td>
                         <td class="text-end">
-                            <a href="articles_edit.php?id=<?= $article['id'] ?>" class="btn btn-primary">Upravit</a>
-                            <a href="articles_delete.php?id=<?= $article['id'] ?>" class="btn btn-danger">Smazat</a>
+                            <?php
+                                $canEditArticles =
+                                    (SessionPermissionsUtils::CheckIfPermExistsOnResource('write_own', 'articles')
+                                        && $article['OWNED_BY_CURRENT_USER'] == 1)
+                                    || SessionPermissionsUtils::CheckIfPermExistsOnResource('write_all', 'articles');
+
+                                $canDeleteArticles =
+                                    (SessionPermissionsUtils::CheckIfPermExistsOnResource('delete_own', 'articles')
+                                        && $article['OWNED_BY_CURRENT_USER'] == 1)
+                                    || SessionPermissionsUtils::CheckIfPermExistsOnResource('delete_all', 'articles');
+                            ?>
+
+                            <?php if ($canEditArticles): ?>
+                                <a href="articles_edit.php?id=<?= $article['id'] ?>" class="btn btn-primary">Upravit</a>
+                            <?php endif; ?>
+
+                            <?php if ($canDeleteArticles): ?>
+                                <a href="articles_delete.php?id=<?= $article['id'] ?>" class="btn btn-danger">Smazat</a>
+                            <?php endif; ?>
                         </td>
                     </tr>
                 <?php endforeach; ?>
