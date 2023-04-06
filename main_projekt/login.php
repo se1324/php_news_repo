@@ -73,12 +73,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <form method="post">
                     <div class="mb-3 d-flex justify-content-center">
                         <label class="form-label">Username
-                            <input type="text" class="form-control form-control-lg" name="username">
+                            <input type="text" class="form-control form-control-lg" name="username" value="<?= $_POST['username'] ?? '' ?>">
                         </label>
                     </div>
                     <div class="mb-3 d-flex justify-content-center">
                         <label class="form-label">Password
-                            <input type="text" class="form-control form-control-lg" name="password">
+                            <input type="text" class="form-control form-control-lg" name="password" value="<?= $_POST['password'] ?? '' ?>">
                         </label>
                     </div>
                     <div class="d-flex justify-content-center">

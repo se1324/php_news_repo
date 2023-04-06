@@ -46,10 +46,20 @@ class AuthHandler
             return false;
         }
 
-        $verifyPassword = password_verify($cleanPassword, $user['password']);
+        // Musí to být ošetření,
+        // jelikož password_verify špatně pracuje s prázdným heslem.
 
-        if ($verifyPassword == false) {
-            return false;
+        if (!empty($user['password'])) {
+            $verifyPassword = password_verify($cleanPassword, $user['password']);
+
+            if ($verifyPassword == false) {
+                return false;
+            }
+        }
+        else {
+            if (!empty($password)) {
+                return false;
+            }
         }
 
         $this->SetLoggedIn($user['id'], $user['username']);

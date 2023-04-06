@@ -34,10 +34,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     if (empty($errors)) {
 
-        $auth->Register($_POST['username'], $_POST['password'], $_POST['name'], $_POST['surname']);
+        require_once 'classes/Database.php';
+        $db = new Database();
+        $sql = 'select count(*) as users_count from authors where username = :username';
+        $stmt = $db->conn->prepare($sql);
+        $stmt->execute([
+           ':username' => $_POST['username'],
+        ]);
+        $foundUsersCount = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        header('Location: index.php');
-        die();
+        if ($foundUsersCount['users_count'] == 0) {
+            $auth->Register($_POST['username'], $_POST['password'], $_POST['name'], $_POST['surname']);
+
+            header('Location: index.php');
+            die();
+        }
     }
 }
 
@@ -64,6 +75,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <div class="container-fluid py-3">
     <div class="row justify-content-center">
         <div class="col-6">
+
+            <?php if (isset($foundUsersCount['users_count']) && $foundUsersCount['users_count'] > 0): ?>
+                <div class="alert alert-warning">Uživatelské jméno již existuje</div>
+            <?php endif; ?>
+
             <h1 class="mb-4 display-3 text-center">
                 Registrace
             </h1>
@@ -80,22 +96,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <form method="post">
                     <div class="mb-3 d-flex justify-content-center">
                         <label class="form-label">Jméno
-                            <input type="text" class="form-control form-control-lg" name="name" required>
+                            <input type="text" class="form-control form-control-lg" name="name" value="<?= $_POST['name'] ?? '' ?>" required>
                         </label>
                     </div>
                     <div class="mb-3 d-flex justify-content-center">
                         <label class="form-label">Příjmení
-                            <input type="text" class="form-control form-control-lg" name="surname" required>
+                            <input type="text" class="form-control form-control-lg" name="surname" value="<?= $_POST['surname'] ?? '' ?>" required>
                         </label>
                     </div>
                     <div class="mb-3 d-flex justify-content-center">
                         <label class="form-label">Nové uživatelské jméno
-                            <input type="text" class="form-control form-control-lg" name="username" required>
+                            <input type="text" class="form-control form-control-lg" name="username" value="<?= $_POST['username'] ?? '' ?>" required>
                         </label>
                     </div>
                     <div class="mb-3 d-flex justify-content-center">
                         <label class="form-label">Nové heslo
-                            <input type="text" class="form-control form-control-lg" name="password" required>
+                            <input type="text" class="form-control form-control-lg" name="password" value="<?= $_POST['password'] ?? '' ?>" required>
                         </label>
                     </div>
                     <div class="d-flex justify-content-center">

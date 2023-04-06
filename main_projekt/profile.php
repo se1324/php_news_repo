@@ -2,17 +2,26 @@
 
 header('Cache-Control: no-store, no-cache, max-age=0, must-revalidate');
 
+require_once 'classes/AlertUtils.php';
+
 require_once 'classes/AuthHandler.php';
 require_once 'classes/SessionPermissionsUtils.php';
 $auth = new AuthHandler();
 $auth->CheckIfConnectionAllowed();
 
 if (isset($_GET['id']) && is_numeric($_GET['id'])) {
+
     if (!((SessionPermissionsUtils::CheckIfPermExistsOnResource('read_own', 'profiles')
         && $_GET['id'] == $auth->GetCurrentUserDetails()['user_id'])
         || SessionPermissionsUtils::CheckIfPermExistsOnResource('read_all', 'profiles')))
     {
-        header('Location: index.php');
+        if ($auth->IsUserLoggedIn()) {
+            header('Location: authors_list.php?alert_type=3&alert_message=Neoprávněný přístup');
+        }
+        else {
+            header('Location: index.php');
+        }
+
         die();
     }
 
@@ -56,7 +65,7 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
 
                 $auth->UpdateUserDetails($_GET['id'], $_POST['name'], $_POST['surname'], $_POST['username'], $_POST['password'], $setNewPassword);
 
-                header('Location: profile.php?showsuccess=1&id='.$_GET['id']);
+                header('Location: profile.php?alert_type=1&alert_message=Změna proběhla úspěšně&id='.$_GET['id']);
                 die();
             }
         }
@@ -73,13 +82,24 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
     $userInfo = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($userInfo == false) {
-        header('Location: index.php');
+        if ($auth->IsUserLoggedIn()) {
+            header('Location: authors_list.php?alert_type=3&alert_message=Položka neexistuje');
+        }
+        else {
+            header('Location: index.php');
+        }
+
         die();
     }
 
 }
 else {
-    header('Location: index.php');
+    if ($auth->IsUserLoggedIn()) {
+        header('Location: authors_list.php?alert_type=2&alert_message=Neplatný odkaz');
+    }
+    else {
+        header('Location: index.php');
+    }
     die();
 }
 
@@ -107,11 +127,15 @@ else {
     <h1 class="mb-4">Profil uživatele: <?= $userInfo['name'].' '.$userInfo['surname'] ?></h1>
     <hr class="border border-dark border-2 opacity-75 mb-4">
     <div class="mb-4">
-        <?php if (isset($_GET['showsuccess']) && $_GET['showsuccess'] == 1): ?>
-            <div class="alert alert-success">
-                Změna proběhla úspěšně!
-            </div>
-        <?php endif; ?>
+
+        <?php
+        if (isset($_GET['alert_type'], $_GET['alert_message']) &&
+            is_numeric($_GET['alert_type']) && is_string($_GET['alert_message']))
+        {
+            AlertUtils::CreateAlert($_GET['alert_type'], $_GET['alert_message']);
+        }
+        ?>
+
         <h2 class="mb-4">Osobní údaje</h2>
         <?php if (!empty($errors)): ?>
             <div class="mb-4">
