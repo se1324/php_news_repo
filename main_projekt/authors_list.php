@@ -13,16 +13,25 @@ $auth = new AuthHandler();
 
 $db = new Database();
 
-$sql = 'SELECT *, 
+if ($auth->IsUserLoggedIn()) {
+    $sql = 'SELECT *, 
         (select count(*) from articles where author_id = ath.id and is_published = 1) as articles_count_published,
         (select count(*) from articles where author_id = ath.id and is_published = 0) as articles_count_not_published,
         case ath.id when :current_user_id then 1 else 0 end as OWNED_BY_CURRENT_USER
         from authors ath
         order by OWNED_BY_CURRENT_USER DESC';
-$stmt = $db->conn->prepare($sql);
-$stmt->execute([
+    $stmt = $db->conn->prepare($sql);
+    $stmt->execute([
         ':current_user_id' => $auth->GetCurrentUserDetails()['user_id'],
-]);
+    ]);
+}
+else {
+    $sql = 'SELECT *, 
+        (select count(*) from articles where author_id = ath.id and is_published = 1) as articles_count_published
+        from authors ath';
+    $stmt = $db->conn->prepare($sql);
+    $stmt->execute();
+}
 $authors = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 ?>
@@ -60,7 +69,7 @@ $authors = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </div>
         <div class="mb-3 d-flex justify-content-end">
             <?php
-                $canCreateProfile =
+                $canCreateProfile = $auth->IsUserLoggedIn() &&
                     SessionPermissionsUtils::CheckIfPermExistsOnResource('create', 'profiles');
             ?>
 
@@ -87,19 +96,23 @@ $authors = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             </a>
                         </td>
                         <td>
-                            <?= $author['articles_count_published'].' veřejné, '.$author['articles_count_not_published'].' skryté' ?>
+                            <?php if ($auth->IsUserLoggedIn()): ?>
+                                <?= $author['articles_count_published'].' veřejné, '.$author['articles_count_not_published'].' skryté' ?>
+                            <?php else: ?>
+                                <?= $author['articles_count_published'] ?>
+                            <?php endif; ?>
                         </td>
                         <td>
                             <?= DateUtils::DatumCesky($author['created_at']) ?>
                         </td>
                         <td class="text-end">
                             <?php
-                                $canReadProfile =
+                                $canReadProfile = $auth->IsUserLoggedIn() &&
                                     (SessionPermissionsUtils::CheckIfPermExistsOnResource('read_own', 'profiles')
                                     && $author['OWNED_BY_CURRENT_USER'] == 1)
                                     || SessionPermissionsUtils::CheckIfPermExistsOnResource('read_all', 'profiles');
 
-                                $canDeleteProfile =
+                                $canDeleteProfile = $auth->IsUserLoggedIn() &&
                                     (SessionPermissionsUtils::CheckIfPermExistsOnResource('delete_own', 'profiles')
                                         && $author['OWNED_BY_CURRENT_USER'] == 1)
                                     || SessionPermissionsUtils::CheckIfPermExistsOnResource('delete_all', 'profiles');

@@ -4,6 +4,9 @@ header('Cache-Control: no-store, no-cache, max-age=0, must-revalidate');
 
 require_once 'classes/AlertUtils.php';
 
+require_once 'classes/AuthHandler.php';
+$auth = new AuthHandler();
+
 require_once 'classes/Database.php';
 require_once 'classes/SessionPermissionsUtils.php';
 
@@ -48,7 +51,7 @@ $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </div>
         <div class="mb-3 d-flex justify-content-end">
             <?php
-                $canCreateCategories =
+                $canCreateCategories = $auth->IsUserLoggedIn() &&
                     SessionPermissionsUtils::CheckIfPermExistsOnResource('create', 'categories');
             ?>
 
@@ -74,10 +77,10 @@ $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         </td>
                         <td class="text-end">
                             <?php
-                                $canEditCategories =
+                                $canEditCategories = $auth->IsUserLoggedIn() &&
                                     SessionPermissionsUtils::CheckIfPermExistsOnResource('write_all', 'categories');
 
-                                $canDeleteCategories =
+                                $canDeleteCategories = $auth->IsUserLoggedIn() &&
                                     SessionPermissionsUtils::CheckIfPermExistsOnResource('delete_all', 'categories');
                             ?>
 

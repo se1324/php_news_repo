@@ -10,6 +10,7 @@ require_once 'classes/DateUtils.php';
 require_once 'classes/SessionPermissionsUtils.php';
 require_once 'classes/AuthHandler.php';
 $auth = new AuthHandler();
+$auth->CheckIfConnectionAllowed();
 
 $db = new Database();
 
@@ -20,7 +21,7 @@ $sql = 'select a.id, a.title, a.is_published, a.created_at,
         from articles a
         left join authors ath on a.author_id = ath.id
         left join categories c on a.category_id = c.id
-        order by OWNED_BY_CURRENT_USER DESC, a.title asc';
+        order by OWNED_BY_CURRENT_USER DESC, a.created_at desc';
 $stmt = $db->conn->prepare($sql);
 $stmt->execute([
         ':my_id' => $auth->GetCurrentUserDetails()['user_id'],

@@ -33,6 +33,12 @@ if (isset($_GET['article_id']) && is_numeric($_GET['article_id'])) {
         header('Location: index.php');
         die();
     }
+
+    if ($article['is_published'] == 0 && !$auth->IsUserLoggedIn()) {
+        header('Location: index.php');
+        die();
+    }
+
 }
 else {
     header('Location: index.php');
@@ -60,48 +66,48 @@ else {
 
 <div class="container-fluid row justify-content-center">
     <div class="col-sm-10 col-lg-9 p-4">
-        <div class="mb-4">
-            <div class="mb-5 d-flex justify-content-between">
-                <div>
-                    <a href="index.php" class="btn btn-primary">Zpět na hlavní stránku</a>
-                </div>
-                <div>
-                    <?php
-                        $canEdit =
-                            ((SessionPermissionsUtils::CheckIfPermExistsOnResource('write_own', 'articles')
-                                && $article['author_id'] == $auth->GetCurrentUserDetails()['user_id'])
-                            || SessionPermissionsUtils::CheckIfPermExistsOnResource('write_all', 'articles'));
-                        $canDelete =
-                            ((SessionPermissionsUtils::CheckIfPermExistsOnResource('delete_own', 'articles')
-                                && $article['author_id'] == $auth->GetCurrentUserDetails()['user_id'])
-                            || SessionPermissionsUtils::CheckIfPermExistsOnResource('delete_all', 'articles'));
-                    ?>
-                    <?php if ($canEdit): ?>
-                        <a href="articles_edit.php?id=<?= $article['id'] ?>&redirect=articles_detail" class="btn btn-primary me-1">Upravit článek</a>
-                    <?php endif; ?>
-                    <?php if ($canDelete): ?>
-                        <a href="articles_delete.php?id=<?= $article['id'] ?>" class="btn btn-danger">Smazat článek</a>
-                    <?php endif; ?>
-                </div>
+        <div class="mb-5 d-flex justify-content-between">
+            <div>
+                <a href="index.php" class="btn btn-primary">Zpět na hlavní stránku</a>
             </div>
-            <div class="display-5 fw-bold mb-4">
-                <?= $article['title'] ?>
-            </div>
-            <div class="text-muted fw-semibold mb-1">
-                Kategorie:
-                <a href="categories_detail.php?id=<?= $article['cat_id'] ?>"><?= $article['category_name'] ?></a>
-            </div>
-            <div class="text-muted fw-semibold mb-4">
-                <time>
-                    <?= DateUtils::DatumCesky($article['created_at']) ?>
-                </time>
-                <a href="authors_detail.php?id=<?= $article['author_id'] ?>"><?= $article['author_fullname'] ?></a>
-            </div>
-            <hr class="border border-dark border-1 opacity-75 mb-4">
-            <div class="ar_introduction mb-3 fs-3 fw-bold">
-                <?= $article['introduction'] ?>
+            <div>
+                <?php
+                    $canEdit = $auth->IsUserLoggedIn() &&
+                        ((SessionPermissionsUtils::CheckIfPermExistsOnResource('write_own', 'articles')
+                            && $article['author_id'] == $auth->GetCurrentUserDetails()['user_id'])
+                        || SessionPermissionsUtils::CheckIfPermExistsOnResource('write_all', 'articles'));
+
+                    $canDelete = $auth->IsUserLoggedIn() &&
+                        ((SessionPermissionsUtils::CheckIfPermExistsOnResource('delete_own', 'articles')
+                            && $article['author_id'] == $auth->GetCurrentUserDetails()['user_id'])
+                        || SessionPermissionsUtils::CheckIfPermExistsOnResource('delete_all', 'articles'));
+                ?>
+                <?php if ($canEdit): ?>
+                    <a href="articles_edit.php?id=<?= $article['id'] ?>&redirect=articles_detail" class="btn btn-primary me-1">Upravit článek</a>
+                <?php endif; ?>
+                <?php if ($canDelete): ?>
+                    <a href="articles_delete.php?id=<?= $article['id'] ?>" class="btn btn-danger">Smazat článek</a>
+                <?php endif; ?>
             </div>
         </div>
+        <div class="display-5 fw-bold mb-4">
+            <?= $article['title'] ?>
+        </div>
+        <div class="text-muted fw-semibold mb-1">
+            Kategorie:
+            <a href="categories_detail.php?id=<?= $article['cat_id'] ?>"><?= $article['category_name'] ?></a>
+        </div>
+        <div class="text-muted fw-semibold mb-4">
+            <time>
+                <?= DateUtils::DatumCesky($article['created_at']) ?>
+            </time>
+            <a href="authors_detail.php?id=<?= $article['author_id'] ?>"><?= $article['author_fullname'] ?></a>
+        </div>
+        <hr class="border border-dark border-1 opacity-75 mb-4">
+        <div class="ar_introduction mb-4 fs-3 fw-bold">
+            <?= $article['introduction'] ?>
+        </div>
+        <hr class="border border-dark border-1 opacity-75 mb-4">
         <div>
             <?= $article['content'] ?>
         </div>

@@ -70,7 +70,8 @@ else {
         <h1>Články autora: <?= $author['name'].' '.$author['surname'] ?></h1>
 
         <?php
-            $canReadProfile = $auth->IsUserLoggedIn() && (SessionPermissionsUtils::CheckIfPermExistsOnResource('read_own', 'profiles')
+            $canReadProfile = $auth->IsUserLoggedIn() &&
+                (SessionPermissionsUtils::CheckIfPermExistsOnResource('read_own', 'profiles')
                 && $author['id'] == $auth->GetCurrentUserDetails()['user_id'])
                 || SessionPermissionsUtils::CheckIfPermExistsOnResource('read_all', 'profiles');
         ?>

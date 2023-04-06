@@ -21,19 +21,20 @@ $currentUserInfo = $auth->GetCurrentUserDetails();
             }
             ?>" href="index.php">Zprávy</a>
 
+            <a class="nav-link
+            <?php
+            if ($base == 'categories_list' || $base == 'categories_detail' || $base == 'categories_edit' || $base == 'categories_add') {
+                echo "active";
+            }
+            ?>" href="categories_list.php">Kategorie</a>
+            <a class="nav-link
+            <?php
+            if ($base == 'authors_list' || $base == 'authors_detail' || $base == 'authors_edit' || $base == 'authors_add') {
+                echo "active";
+            }
+            ?>" href="authors_list.php">Autoři</a>
+
             <?php if (isset($currentUserInfo['logged_in']) && $currentUserInfo['logged_in'] == true): ?>
-                <a class="nav-link
-                <?php
-                if ($base == 'categories_list' || $base == 'categories_detail' || $base == 'categories_edit' || $base == 'categories_add') {
-                    echo "active";
-                }
-                ?>" href="categories_list.php">Kategorie</a>
-                <a class="nav-link
-                <?php
-                if ($base == 'authors_list' || $base == 'authors_detail' || $base == 'authors_edit' || $base == 'authors_add') {
-                    echo "active";
-                }
-                ?>" href="authors_list.php">Autoři</a>
                 <a class="nav-link
                 <?php
                 if ($base == 'articles_list' || $base == 'articles_edit' || $base == 'articles_add') {
